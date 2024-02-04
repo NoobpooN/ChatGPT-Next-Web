@@ -361,7 +361,7 @@ function getEmojiUrl(unified, style) {
     // Whoever owns this Content Delivery Network (CDN), I am using your CDN to serve emojis
     // Old CDN broken, so I had to switch to this one
     // Author: https://github.com/H0llyW00dzZ
-    return `https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/${style}/64/${unified}.png`;
+    return `https://fastly.jsdelivr.net/npm/emoji-datasource-apple/img/${style}/64/${unified}.png`;
 }
 function AvatarPicker(props) {
     return /*#__PURE__*/ jsx_runtime_.jsx(dist["default"], {

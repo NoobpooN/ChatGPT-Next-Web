@@ -465,7 +465,7 @@ function DangerItems() {
 function CheckButton() {
     const syncStore = (0,sync/* useSyncStore */.i)();
     const couldCheck = (0,react_.useMemo)(()=>{
-        return syncStore.coundSync();
+        return syncStore.cloudSync();
     }, [
         syncStore
     ]);
@@ -619,7 +619,7 @@ function SyncItems() {
     const promptStore = (0,store_prompt/* usePromptStore */.f)();
     const maskStore = (0,mask/* useMaskStore */.Zy)();
     const couldSync = (0,react_.useMemo)(()=>{
-        return syncStore.coundSync();
+        return syncStore.cloudSync();
     }, [
         syncStore
     ]);
