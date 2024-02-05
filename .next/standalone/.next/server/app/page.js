@@ -1207,14 +1207,14 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_re
 
 /***/ }),
 
-/***/ 42391:
+/***/ 96302:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494));
 Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 49967));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 82927, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 60209, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23));
+Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494))
 
 /***/ }),
 
@@ -3393,7 +3393,7 @@ const Google = {
 };
 const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
 const DEFAULT_SYSTEM_TEMPLATE = `
-You are ChatGPT, a large language model trained by OpenAI.
+You are ChatGPT, a large language model trained by {{ServiceProvider}}.
 Knowledge cutoff: {{cutoff}}
 Current model: {{model}}
 Current time: {{time}}
@@ -9903,8 +9903,16 @@ function countMessages(msgs) {
     return msgs.reduce((pre, cur)=>pre + estimateTokenLength(cur.content), 0);
 }
 function fillTemplateWith(input, modelConfig) {
-    let cutoff = constant/* KnowledgeCutOffDate */.S3[modelConfig.model] ?? constant/* KnowledgeCutOffDate */.S3.default;
+    const cutoff = constant/* KnowledgeCutOffDate */.S3[modelConfig.model] ?? constant/* KnowledgeCutOffDate */.S3.default;
+    // Find the model in the DEFAULT_MODELS array that matches the modelConfig.model
+    const modelInfo = constant/* DEFAULT_MODELS */.Fv.find((m)=>m.name === modelConfig.model);
+    if (!modelInfo) {
+        throw new Error(`Model ${modelConfig.model} not found in DEFAULT_MODELS array.`);
+    }
+    // Directly use the providerName from the modelInfo
+    const serviceProvider = modelInfo.provider.providerName;
     const vars = {
+        ServiceProvider: serviceProvider,
         cutoff,
         model: modelConfig.model,
         time: new Date().toLocaleString(),
@@ -9918,7 +9926,8 @@ function fillTemplateWith(input, modelConfig) {
         output += "\n" + inputVar;
     }
     Object.entries(vars).forEach(([name, value])=>{
-        output = output.replaceAll(`{{${name}}}`, value);
+        const regex = new RegExp(`{{${name}}}`, "g");
+        output = output.replace(regex, value.toString()); // Ensure value is a string
     });
     return output;
 }
@@ -12059,7 +12068,7 @@ const Google = {
 };
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
 const DEFAULT_SYSTEM_TEMPLATE = (/* unused pure expression or super */ null && (`
-You are ChatGPT, a large language model trained by OpenAI.
+You are ChatGPT, a large language model trained by {{ServiceProvider}}.
 Knowledge cutoff: {{cutoff}}
 Current model: {{model}}
 Current time: {{time}}

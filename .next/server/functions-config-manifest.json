@@ -1,6 +1,6 @@
 {
-  "/api/cors/[...path]": {},
   "/api/config": {},
+  "/api/cors/[...path]": {},
   "/api/google/[...path]": {},
   "/api/openai/[...path]": {}
 }
