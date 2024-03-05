@@ -519,7 +519,7 @@ function ModelConfigList(props) {
                     onChange: (e)=>props.updateConfig((config)=>config.max_tokens = _store__WEBPACK_IMPORTED_MODULE_1__/* .ModalConfigValidator */ .Xm.max_tokens(e.currentTarget.valueAsNumber))
                 })
             }),
-            props.modelConfig.model === "gemini-pro" ? null : /*#__PURE__*/ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+            props.modelConfig.model.startsWith("gemini") ? null : /*#__PURE__*/ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                 children: [
                     /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_ui_lib__WEBPACK_IMPORTED_MODULE_4__/* .ListItem */ .HC, {
                         title: _locales__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .ZP.Settings.PresencePenalty.Title,

@@ -1,7 +1,7 @@
 {
   "/api/config/route": "app/api/config/route.js",
+  "/api/openai/[...path]/route": "app/api/openai/[...path]/route.js",
   "/api/cors/[...path]/route": "app/api/cors/[...path]/route.js",
   "/api/google/[...path]/route": "app/api/google/[...path]/route.js",
-  "/api/openai/[...path]/route": "app/api/openai/[...path]/route.js",
   "/page": "app/page.js"
 }

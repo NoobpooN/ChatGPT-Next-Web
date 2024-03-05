@@ -1218,14 +1218,14 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_re
 
 /***/ }),
 
-/***/ 19660:
+/***/ 19870:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 47734, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 88709, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 62698, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 7833, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 29150, 23))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 62698, 23));
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 29150, 23));
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 47734, 23))
 
 /***/ }),
 
@@ -1264,7 +1264,10 @@ function makeAzurePath(path, apiVersion) {
     return path;
 }
 
+// EXTERNAL MODULE: ./app/utils.ts
+var utils = __webpack_require__(92842);
 ;// CONCATENATED MODULE: ./app/client/platforms/openai.ts
+/* __next_internal_client_entry_do_not_use__ ChatGPTApi,OpenaiPath auto */ 
 
 
 
@@ -1283,7 +1286,7 @@ class ChatGPTApi {
         let baseUrl = isAzure ? accessStore.azureUrl : accessStore.openaiUrl;
         if (baseUrl.length === 0) {
             const isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
-            baseUrl = isApp ? constant/* DEFAULT_API_HOST */.Ky : constant/* ApiPath */.L.OpenAI;
+            baseUrl = isApp ? constant/* DEFAULT_API_HOST */.Ky + "/proxy" + constant/* ApiPath */.L.OpenAI : constant/* ApiPath */.L.OpenAI;
         }
         if (baseUrl.endsWith("/")) {
             baseUrl = baseUrl.slice(0, baseUrl.length - 1);
@@ -1294,6 +1297,7 @@ class ChatGPTApi {
         if (isAzure) {
             path = makeAzurePath(path, accessStore.azureApiVersion);
         }
+        console.log("[Proxy Endpoint] ", baseUrl, path);
         return [
             baseUrl,
             path
@@ -1303,9 +1307,10 @@ class ChatGPTApi {
         return res.choices?.at(0)?.message?.content ?? "";
     }
     async chat(options) {
+        const visionModel = (0,utils/* isVisionModel */.Xf)(options.config.model);
         const messages = options.messages.map((v)=>({
                 role: v.role,
-                content: v.content
+                content: visionModel ? v.content : (0,utils/* getMessageTextContent */.YK)(v)
             }));
         const modelConfig = {
             ...store/* useAppConfig */.MG.getState().modelConfig,
@@ -1323,6 +1328,15 @@ class ChatGPTApi {
             frequency_penalty: modelConfig.frequency_penalty,
             top_p: modelConfig.top_p
         };
+        // add max_tokens to vision model
+        if (visionModel) {
+            Object.defineProperty(requestPayload, "max_tokens", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: modelConfig.max_tokens
+            });
+        }
         console.log("[Request] openai payload: ", requestPayload);
         const shouldStream = !!options.config.stream;
         const controller = new AbortController();
@@ -1506,21 +1520,45 @@ class ChatGPTApi {
 
 
 
+
+
+
 class GeminiProApi {
     extractMessage(res) {
         console.log("[Response] gemini-pro response: ", res);
         return res?.candidates?.at(0)?.content?.parts.at(0)?.text || res?.error?.message || "";
     }
     async chat(options) {
-        const apiClient = this;
-        const messages = options.messages.map((v)=>({
+        // const apiClient = this;
+        const visionModel = (0,utils/* isVisionModel */.Xf)(options.config.model);
+        let multimodal = false;
+        const messages = options.messages.map((v)=>{
+            let parts = [
+                {
+                    text: (0,utils/* getMessageTextContent */.YK)(v)
+                }
+            ];
+            if (visionModel) {
+                const images = (0,utils/* getMessageImages */.Bs)(v);
+                if (images.length > 0) {
+                    multimodal = true;
+                    parts = parts.concat(images.map((image)=>{
+                        const imageType = image.split(";")[0].split(":")[1];
+                        const imageData = image.split(",")[1];
+                        return {
+                            inline_data: {
+                                mime_type: imageType,
+                                data: imageData
+                            }
+                        };
+                    }));
+                }
+            }
+            return {
                 role: v.role.replace("assistant", "model").replace("system", "user"),
-                parts: [
-                    {
-                        text: v.content
-                    }
-                ]
-            }));
+                parts: parts
+            };
+        });
         // google requires that role in neighboring messages must not be the same
         for(let i = 0; i < messages.length - 1;){
             // Check if current and next item both have the role "model"
@@ -1534,6 +1572,9 @@ class GeminiProApi {
                 i++;
             }
         }
+        // if (visionModel && messages.length > 1) {
+        //   options.onError?.(new Error("Multiturn chat is not enabled for models/gemini-pro-vision"));
+        // }
         const modelConfig = {
             ...store/* useAppConfig */.MG.getState().modelConfig,
             ...store/* useChatStore */.aK.getState().currentSession().mask.modelConfig,
@@ -1570,12 +1611,22 @@ class GeminiProApi {
                 }
             ]
         };
-        console.log("[Request] google payload: ", requestPayload);
-        const shouldStream = !!options.config.stream;
+        const accessStore = store/* useAccessStore */._X.getState();
+        let baseUrl = accessStore.googleUrl;
+        const isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
+        let shouldStream = !!options.config.stream;
         const controller = new AbortController();
         options.onController?.(controller);
         try {
-            const chatPath = this.path(constant/* Google */.ie.ChatPath);
+            let googleChatPath = visionModel ? constant/* Google */.ie.VisionChatPath : constant/* Google */.ie.ChatPath;
+            let chatPath = this.path(googleChatPath);
+            // let baseUrl = accessStore.googleUrl;
+            if (!baseUrl) {
+                baseUrl = isApp ? constant/* DEFAULT_API_HOST */.Ky + "/api/proxy/google/" + googleChatPath : chatPath;
+            }
+            if (isApp) {
+                baseUrl += `?key=${accessStore.googleApiKey}`;
+            }
             const chatPayload = {
                 method: "POST",
                 body: JSON.stringify(requestPayload),
@@ -1587,7 +1638,6 @@ class GeminiProApi {
             if (shouldStream) {
                 let responseText = "";
                 let remainText = "";
-                let streamChatPath = chatPath.replace("generateContent", "streamGenerateContent");
                 let finished = false;
                 let existingTexts = [];
                 const finish = ()=>{
@@ -1612,12 +1662,24 @@ class GeminiProApi {
                 }
                 // start animaion
                 animateResponseText();
-                fetch(streamChatPath, chatPayload).then((response)=>{
+                fetch(baseUrl.replace("generateContent", "streamGenerateContent"), chatPayload).then((response)=>{
                     const reader = response?.body?.getReader();
                     const decoder = new TextDecoder();
                     let partialData = "";
                     return reader?.read().then(function processText({ done, value }) {
                         if (done) {
+                            if (response.status !== 200) {
+                                try {
+                                    let data = JSON.parse(ensureProperEnding(partialData));
+                                    if (data && data[0].error) {
+                                        options.onError?.(new Error(data[0].error.message));
+                                    } else {
+                                        options.onError?.(new Error("Request failed"));
+                                    }
+                                } catch (_) {
+                                    options.onError?.(new Error("Request failed"));
+                                }
+                            }
                             console.log("Stream complete");
                             // options.onFinish(responseText + remainText);
                             finished = true;
@@ -1647,7 +1709,7 @@ class GeminiProApi {
                     console.error("Error:", error);
                 });
             } else {
-                const res = await fetch(chatPath, chatPayload);
+                const res = await fetch(baseUrl, chatPayload);
                 clearTimeout(requestTimeoutId);
                 const resJson = await res.json();
                 if (resJson?.promptFeedback?.blockReason) {
@@ -1745,21 +1807,24 @@ function getHeaders() {
     const accessStore = store/* useAccessStore */._X.getState();
     const headers = {
         "Content-Type": "application/json",
-        "x-requested-with": "XMLHttpRequest",
-        "Accept": "application/json"
+        Accept: "application/json"
     };
     const modelConfig = store/* useChatStore */.aK.getState().currentSession().mask.modelConfig;
-    const isGoogle = modelConfig.model === "gemini-pro";
+    const isGoogle = modelConfig.model.startsWith("gemini");
     const isAzure = accessStore.provider === constant/* ServiceProvider */.UT.Azure;
     const authHeader = isAzure ? "api-key" : "Authorization";
     const apiKey = isGoogle ? accessStore.googleApiKey : isAzure ? accessStore.azureApiKey : accessStore.openaiApiKey;
+    const clientConfig = (0,client/* getClientConfig */.Z)();
     const makeBearer = (s)=>`${isAzure ? "" : "Bearer "}${s.trim()}`;
     const validString = (x)=>x && x.length > 0;
-    // use user's api key first
-    if (validString(apiKey)) {
-        headers[authHeader] = makeBearer(apiKey);
-    } else if (accessStore.enabledAccessControl() && validString(accessStore.accessCode)) {
-        headers[authHeader] = makeBearer(constant/* ACCESS_CODE_PREFIX */.TW + accessStore.accessCode);
+    // when using google api in app, not set auth header
+    if (!(isGoogle && clientConfig?.isApp)) {
+        // use user's api key first
+        if (validString(apiKey)) {
+            headers[authHeader] = makeBearer(apiKey);
+        } else if (accessStore.enabledAccessControl() && validString(accessStore.accessCode)) {
+            headers[authHeader] = makeBearer(constant/* ACCESS_CODE_PREFIX */.TW + accessStore.accessCode);
+        }
     }
     return headers;
 }
@@ -2515,7 +2580,7 @@ const Settings = app_dynamic_default()(async ()=>(await Promise.all(/* import() 
             noLogo: true
         })
 });
-const Chat = app_dynamic_default()(async ()=>(await Promise.all(/* import() */[__webpack_require__.e(480), __webpack_require__.e(1423), __webpack_require__.e(5436), __webpack_require__.e(2676), __webpack_require__.e(4417), __webpack_require__.e(9449), __webpack_require__.e(8286), __webpack_require__.e(39)]).then(__webpack_require__.bind(__webpack_require__, 10039))).Chat, {
+const Chat = app_dynamic_default()(async ()=>(await Promise.all(/* import() */[__webpack_require__.e(480), __webpack_require__.e(1423), __webpack_require__.e(5436), __webpack_require__.e(2676), __webpack_require__.e(4417), __webpack_require__.e(9449), __webpack_require__.e(8286), __webpack_require__.e(7797)]).then(__webpack_require__.bind(__webpack_require__, 7797))).Chat, {
     loadableGenerated: {
         modules: [
             "/Volumes/D/github/ChatGPT-Next-Web/app/components/home.tsx -> " + "./chat"
@@ -2648,7 +2713,7 @@ function Screen() {
 function useLoadData() {
     const config = (0,store_config/* useAppConfig */.MG)();
     var api;
-    if (config.modelConfig.model === "gemini-pro") {
+    if (config.modelConfig.model.startsWith("gemini")) {
         api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
     } else {
         api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
@@ -3207,7 +3272,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 ;// CONCATENATED MODULE: ./src-tauri/tauri.conf.json
-const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.10.1"}}');
+const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.11.2"}}');
 ;// CONCATENATED MODULE: ./app/config/build.ts
 
 const getBuildConfig = ()=>{
@@ -3283,9 +3348,9 @@ function queryMeta(key, defaultValue) {
 /* harmony export */   KJ: () => (/* binding */ StoreKey),
 /* harmony export */   Ky: () => (/* binding */ DEFAULT_API_HOST),
 /* harmony export */   L: () => (/* binding */ ApiPath),
-/* harmony export */   LE: () => (/* binding */ DEFAULT_CORS_HOST),
 /* harmony export */   M: () => (/* binding */ DEFAULT_SIDEBAR_WIDTH),
 /* harmony export */   NQ: () => (/* binding */ MIN_SIDEBAR_WIDTH),
+/* harmony export */   PF: () => (/* binding */ GEMINI_SUMMARIZE_MODEL),
 /* harmony export */   S3: () => (/* binding */ KnowledgeCutOffDate),
 /* harmony export */   Sb: () => (/* binding */ LAST_INPUT_KEY),
 /* harmony export */   TE: () => (/* binding */ FETCH_COMMIT_URL),
@@ -3319,8 +3384,7 @@ const RELEASE_URL = `${REPO_URL}/releases`;
 const FETCH_COMMIT_URL = `https://api.github.com/repos/${OWNER}/${REPO}/commits?per_page=1`;
 const FETCH_TAG_URL = `https://api.github.com/repos/${OWNER}/${REPO}/tags?per_page=1`;
 const RUNTIME_CONFIG_DOM = "danger-runtime-config";
-const DEFAULT_CORS_HOST = "https://a.nextweb.fun";
-const DEFAULT_API_HOST = `${DEFAULT_CORS_HOST}/api/proxy`;
+const DEFAULT_API_HOST = "https://api.nextchat.dev";
 const OPENAI_BASE_URL = "https://api.openai.com";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
 var Path;
@@ -3389,7 +3453,8 @@ const Azure = {
 };
 const Google = {
     ExampleEndpoint: "https://generativelanguage.googleapis.com/",
-    ChatPath: "v1beta/models/gemini-pro:generateContent"
+    ChatPath: "v1beta/models/gemini-pro:generateContent",
+    VisionChatPath: "v1beta/models/gemini-pro-vision:generateContent"
 };
 const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
 const DEFAULT_SYSTEM_TEMPLATE = `
@@ -3401,12 +3466,16 @@ Latex inline: $x^2$
 Latex block: $$e=mc^2$$
 `;
 const SUMMARIZE_MODEL = "gpt-3.5-turbo";
+const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
 const KnowledgeCutOffDate = {
     default: "2021-09",
-    "gpt-4-turbo-preview": "2023-04",
+    "gpt-4-turbo-preview": "2023-12",
     "gpt-4-1106-preview": "2023-04",
-    "gpt-4-0125-preview": "2023-04",
-    "gpt-4-vision-preview": "2023-04"
+    "gpt-4-0125-preview": "2023-12",
+    "gpt-4-vision-preview": "2023-04",
+    // After improvements,
+    // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
+    "gemini-pro": "2023-12"
 };
 const DEFAULT_MODELS = [
     {
@@ -3570,6 +3639,15 @@ const DEFAULT_MODELS = [
             providerName: "Google",
             providerType: "google"
         }
+    },
+    {
+        name: "gemini-pro-vision",
+        available: true,
+        provider: {
+            id: "google",
+            providerName: "Google",
+            providerType: "google"
+        }
     }
 ];
 const CHAT_PAGE_SIZE = 15;
@@ -3658,7 +3736,8 @@ const cn = {
             Prompt: "快捷指令",
             Masks: "所有面具",
             Clear: "清除聊天",
-            Settings: "对话设置"
+            Settings: "对话设置",
+            UploadImage: "上传图片"
         },
         Rename: "重命名对话",
         Typing: "正在输入…",
@@ -3898,17 +3977,17 @@ const cn = {
             },
             Google: {
                 ApiKey: {
-                    Title: "接口密钥",
-                    SubTitle: "使用自定义 Google AI Studio API Key 绕过密码访问限制",
-                    Placeholder: "Google AI Studio API Key"
+                    Title: "API 密钥",
+                    SubTitle: "从 Google AI 获取您的 API 密钥",
+                    Placeholder: "输入您的 Google AI Studio API 密钥"
                 },
                 Endpoint: {
-                    Title: "接口地址",
-                    SubTitle: "不包含请求路径，样例："
+                    Title: "终端地址",
+                    SubTitle: "示例："
                 },
-                ApiVerion: {
-                    Title: "接口版本 (gemini-pro api version)",
-                    SubTitle: "选择指定的部分版本"
+                ApiVersion: {
+                    Title: "API 版本（仅适用于 gemini-pro）",
+                    SubTitle: "选择一个特定的 API 版本"
                 }
             },
             CustomModel: {
@@ -4107,7 +4186,8 @@ const en = {
             Prompt: "Prompts",
             Masks: "Masks",
             Clear: "Clear Context",
-            Settings: "Settings"
+            Settings: "Settings",
+            UploadImage: "Upload Images"
         },
         Rename: "Rename Chat",
         Typing: "Typing…",
@@ -4352,16 +4432,16 @@ const en = {
             Google: {
                 ApiKey: {
                     Title: "API Key",
-                    SubTitle: "Bypass password access restrictions using a custom Google AI Studio API Key",
-                    Placeholder: "Google AI Studio API Key"
+                    SubTitle: "Obtain your API Key from Google AI",
+                    Placeholder: "Enter your Google AI Studio API Key"
                 },
                 Endpoint: {
                     Title: "Endpoint Address",
                     SubTitle: "Example:"
                 },
-                ApiVerion: {
-                    Title: "API Version (gemini-pro api version)",
-                    SubTitle: "Select a specific part version"
+                ApiVersion: {
+                    Title: "API Version (specific to gemini-pro)",
+                    SubTitle: "Select a specific API version"
                 }
             }
         },
@@ -4929,16 +5009,33 @@ const pt = {
 
 ;// CONCATENATED MODULE: ./app/locales/tw.ts
 
+
+const tw_isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
 const tw = {
     WIP: "該功能仍在開發中……",
     Error: {
-        Unauthorized: "目前您的狀態是未授權，請前往[設定頁面](/#/auth)輸入授權碼。"
+        Unauthorized: tw_isApp ? "檢測到無效 API Key，請前往[設定](/#/settings)頁檢查 API Key 是否設定正確。" : "訪問密碼不正確或為空，請前往[登入](/#/auth)頁輸入正確的訪問密碼，或者在[設定](/#/settings)頁填入你自己的 OpenAI API Key。"
+    },
+    Auth: {
+        Title: "需要密碼",
+        Tips: "管理員開啟了密碼驗證，請在下方填入訪問碼",
+        SubTips: "或者輸入你的 OpenAI 或 Google API 密鑰",
+        Input: "在此處填寫訪問碼",
+        Confirm: "確認",
+        Later: "稍候再說"
     },
     ChatItem: {
         ChatItemCount: (count)=>`${count} 則對話`
     },
     Chat: {
         SubTitle: (count)=>`您已經與 ChatGPT 進行了 ${count} 則對話`,
+        EditMessage: {
+            Title: "編輯消息記錄",
+            Topic: {
+                Title: "聊天主題",
+                SubTitle: "更改當前聊天主題"
+            }
+        },
         Actions: {
             ChatList: "檢視訊息列表",
             CompressedHistory: "檢視壓縮後的歷史 Prompt",
@@ -4946,7 +5043,33 @@ const tw = {
             Copy: "複製",
             Stop: "停止",
             Retry: "重試",
-            Delete: "刪除"
+            Pin: "固定",
+            PinToastContent: "已將 1 條對話固定至預設提示詞",
+            PinToastAction: "查看",
+            Delete: "刪除",
+            Edit: "編輯"
+        },
+        Commands: {
+            new: "新建聊天",
+            newm: "從面具新建聊天",
+            next: "下一個聊天",
+            prev: "上一個聊天",
+            clear: "清除上下文",
+            del: "刪除聊天"
+        },
+        InputActions: {
+            Stop: "停止回應",
+            ToBottom: "移至最新",
+            Theme: {
+                auto: "自動主題",
+                light: "亮色模式",
+                dark: "深色模式"
+            },
+            Prompt: "快捷指令",
+            Masks: "所有面具",
+            Clear: "清除聊天",
+            Settings: "對話設定",
+            UploadImage: "上傳圖片"
         },
         Rename: "重新命名對話",
         Typing: "正在輸入…",
@@ -4961,14 +5084,38 @@ const tw = {
         Config: {
             Reset: "重設",
             SaveAs: "另存新檔"
-        }
+        },
+        IsContext: "預設提示詞"
     },
     Export: {
         Title: "將聊天記錄匯出為 Markdown",
         Copy: "複製全部",
         Download: "下載檔案",
+        Share: "分享到 ShareGPT",
         MessageFromYou: "來自您的訊息",
-        MessageFromChatGPT: "來自 ChatGPT 的訊息"
+        MessageFromChatGPT: "來自 ChatGPT 的訊息",
+        Format: {
+            Title: "導出格式",
+            SubTitle: "可以導出 Markdown 文本或者 PNG 圖片"
+        },
+        IncludeContext: {
+            Title: "包含面具上下文",
+            SubTitle: "是否在消息中展示面具上下文"
+        },
+        Steps: {
+            Select: "選取",
+            Preview: "預覽"
+        },
+        Image: {
+            Toast: "正在生成截圖",
+            Modal: "長按或右鍵保存圖片"
+        }
+    },
+    Select: {
+        Search: "查詢消息",
+        All: "選取全部",
+        Latest: "最近幾條",
+        Clear: "清除選中"
     },
     Memory: {
         Title: "上下文記憶 Prompt",
@@ -4987,6 +5134,20 @@ const tw = {
     Settings: {
         Title: "設定",
         SubTitle: "設定選項",
+        Danger: {
+            Reset: {
+                Title: "重置所有設定",
+                SubTitle: "重置所有設定項回預設值",
+                Action: "立即重置",
+                Confirm: "確認重置所有設定？"
+            },
+            Clear: {
+                Title: "清除所有資料",
+                SubTitle: "清除所有聊天、設定資料",
+                Action: "立即清除",
+                Confirm: "確認清除所有聊天、設定資料？"
+            }
+        },
         Lang: {
             Name: "Language",
             All: "所有語言"
@@ -4999,6 +5160,10 @@ const tw = {
         InjectSystemPrompts: {
             Title: "匯入系統提示",
             SubTitle: "強制在每個請求的訊息列表開頭新增一個模擬 ChatGPT 的系統提示"
+        },
+        InputTemplate: {
+            Title: "用戶輸入預處理",
+            SubTitle: "用戶最新的一條消息會填充到此模板"
         },
         Update: {
             Version: (x)=>`目前版本：${x}`,
@@ -5015,10 +5180,57 @@ const tw = {
             Title: "預覽氣泡",
             SubTitle: "在預覽氣泡中預覽 Markdown 內容"
         },
+        AutoGenerateTitle: {
+            Title: "自動生成標題",
+            SubTitle: "根據對話內容生成合適的標題"
+        },
+        Sync: {
+            CloudState: "雲端資料",
+            NotSyncYet: "還沒有進行過同步",
+            Success: "同步成功",
+            Fail: "同步失敗",
+            Config: {
+                Modal: {
+                    Title: "設定雲端同步",
+                    Check: "檢查可用性"
+                },
+                SyncType: {
+                    Title: "同步類型",
+                    SubTitle: "選擇喜愛的同步服務器"
+                },
+                Proxy: {
+                    Title: "啟用代理",
+                    SubTitle: "在瀏覽器中同步時，必須啟用代理以避免跨域限制"
+                },
+                ProxyUrl: {
+                    Title: "代理地址",
+                    SubTitle: "僅適用於本項目自帶的跨域代理"
+                },
+                WebDav: {
+                    Endpoint: "WebDAV 地址",
+                    UserName: "用戶名",
+                    Password: "密碼"
+                },
+                UpStash: {
+                    Endpoint: "UpStash Redis REST Url",
+                    UserName: "備份名稱",
+                    Password: "UpStash Redis REST Token"
+                }
+            },
+            LocalState: "本地資料",
+            Overview: (overview)=>{
+                return `${overview.chat} 次對話，${overview.message} 條消息，${overview.prompt} 條提示詞，${overview.mask} 個面具`;
+            },
+            ImportFailed: "導入失敗"
+        },
         Mask: {
             Splash: {
                 Title: "面具啟動頁面",
                 SubTitle: "新增聊天時，呈現面具啟動頁面"
+            },
+            Builtin: {
+                Title: "隱藏內置面具",
+                SubTitle: "在所有面具列表中隱藏內置面具"
             }
         },
         Prompt: {
@@ -5055,10 +5267,74 @@ const tw = {
             Check: "重新檢查",
             NoAccess: "輸入 API Key 檢視餘額"
         },
+        Access: {
+            AccessCode: {
+                Title: "訪問密碼",
+                SubTitle: "管理員已開啟加密訪問",
+                Placeholder: "請輸入訪問密碼"
+            },
+            CustomEndpoint: {
+                Title: "自定義接口 (Endpoint)",
+                SubTitle: "是否使用自定義 Azure 或 OpenAI 服務"
+            },
+            Provider: {
+                Title: "模型服務商",
+                SubTitle: "切換不同的服務商"
+            },
+            OpenAI: {
+                ApiKey: {
+                    Title: "API Key",
+                    SubTitle: "使用自定義 OpenAI Key 繞過密碼訪問限制",
+                    Placeholder: "OpenAI API Key"
+                },
+                Endpoint: {
+                    Title: "接口(Endpoint) 地址",
+                    SubTitle: "除默認地址外，必須包含 http(s)://"
+                }
+            },
+            Azure: {
+                ApiKey: {
+                    Title: "接口密鑰",
+                    SubTitle: "使用自定義 Azure Key 繞過密碼訪問限制",
+                    Placeholder: "Azure API Key"
+                },
+                Endpoint: {
+                    Title: "接口(Endpoint) 地址",
+                    SubTitle: "樣例："
+                },
+                ApiVerion: {
+                    Title: "接口版本 (azure api version)",
+                    SubTitle: "選擇指定的部分版本"
+                }
+            },
+            Google: {
+                ApiKey: {
+                    Title: "API 密鑰",
+                    SubTitle: "從 Google AI 獲取您的 API 密鑰",
+                    Placeholder: "輸入您的 Google AI Studio API 密鑰"
+                },
+                Endpoint: {
+                    Title: "終端地址",
+                    SubTitle: "示例："
+                },
+                ApiVersion: {
+                    Title: "API 版本（僅適用於 gemini-pro）",
+                    SubTitle: "選擇一個特定的 API 版本"
+                }
+            },
+            CustomModel: {
+                Title: "自定義模型名",
+                SubTitle: "增加自定義模型可選項，使用英文逗號隔開"
+            }
+        },
         Model: "模型 (model)",
         Temperature: {
             Title: "隨機性 (temperature)",
             SubTitle: "值越大，回應越隨機"
+        },
+        TopP: {
+            Title: "核采樣 (top_p)",
+            SubTitle: "與隨機性類似，但不要和隨機性一起更改"
         },
         MaxTokens: {
             Title: "單次回應限制 (max_tokens)",
@@ -5087,10 +5363,16 @@ const tw = {
         Success: "已複製到剪貼簿中",
         Failed: "複製失敗，請賦予剪貼簿權限"
     },
+    Download: {
+        Success: "內容已下載到您的目錄。",
+        Failed: "下載失敗。"
+    },
     Context: {
         Toast: (x)=>`已設定 ${x} 條前置上下文`,
         Edit: "前置上下文和歷史記憶",
-        Add: "新增一條"
+        Add: "新增一條",
+        Clear: "上下文已清除",
+        Revert: "恢復上下文"
     },
     Plugin: {
         Name: "外掛"
@@ -5121,33 +5403,58 @@ const tw = {
         },
         Config: {
             Avatar: "角色頭像",
-            Name: "角色名稱"
+            Name: "角色名稱",
+            Sync: {
+                Title: "使用全局設定",
+                SubTitle: "當前對話是否使用全局模型設定",
+                Confirm: "當前對話的自定義設定將會被自動覆蓋，確認啟用全局設定？"
+            },
+            HideContext: {
+                Title: "隱藏預設對話",
+                SubTitle: "隱藏後預設對話不會出現在聊天界面"
+            },
+            Share: {
+                Title: "分享此面具",
+                SubTitle: "生成此面具的直達鏈接",
+                Action: "覆制鏈接"
+            }
         }
     },
     NewChat: {
         Return: "返回",
         Skip: "跳過",
+        NotShow: "不再呈現",
+        ConfirmNoShow: "確認停用？停用後可以隨時在設定中重新啟用。",
         Title: "挑選一個面具",
         SubTitle: "現在開始，與面具背後的靈魂思維碰撞",
-        More: "搜尋更多",
-        NotShow: "不再呈現",
-        ConfirmNoShow: "確認停用？停用後可以隨時在設定中重新啟用。"
+        More: "搜尋更多"
+    },
+    URLCommand: {
+        Code: "檢測到連結中已經包含訪問碼，是否自動填入？",
+        Settings: "檢測到連結中包含了預設設定，是否自動填入？"
     },
     UI: {
         Confirm: "確認",
         Cancel: "取消",
         Close: "關閉",
         Create: "新增",
-        Edit: "編輯"
+        Edit: "編輯",
+        Export: "導出",
+        Import: "導入",
+        Sync: "同步",
+        Config: "設定"
     },
     Exporter: {
+        Description: {
+            Title: "只有清除上下文之後的消息會被展示"
+        },
         Model: "模型",
         Messages: "訊息",
         Topic: "主題",
         Time: "時間"
     }
 };
-/* harmony default export */ const locales_tw = (tw);
+/* harmony default export */ const locales_tw = (tw); // Translated by @chunkiuuu, feel free the submit new pr if there are typo/incorrect translations :D
 
 ;// CONCATENATED MODULE: ./app/locales/id.ts
 
@@ -8918,7 +9225,7 @@ const sk = {
                     Title: "Adresa koncov\xe9ho bodu",
                     SubTitle: "Pr\xedklad:"
                 },
-                ApiVerion: {
+                ApiVersion: {
                     Title: "Verzia API (gemini-pro verzia API)",
                     SubTitle: "Vyberte špecifick\xfa verziu časti"
                 }
@@ -9897,20 +10204,27 @@ function createEmptySession() {
 }
 function getSummarizeModel(currentModel) {
     // if it is using gpt-* models, force to use 3.5 to summarize
-    return currentModel.startsWith("gpt") ? constant/* SUMMARIZE_MODEL */.EF : currentModel;
+    if (currentModel.startsWith("gpt")) {
+        return constant/* SUMMARIZE_MODEL */.EF;
+    }
+    if (currentModel.startsWith("gemini-pro")) {
+        return constant/* GEMINI_SUMMARIZE_MODEL */.PF;
+    }
+    return currentModel;
 }
 function countMessages(msgs) {
-    return msgs.reduce((pre, cur)=>pre + estimateTokenLength(cur.content), 0);
+    return msgs.reduce((pre, cur)=>pre + estimateTokenLength((0,utils/* getMessageTextContent */.YK)(cur)), 0);
 }
 function fillTemplateWith(input, modelConfig) {
     const cutoff = constant/* KnowledgeCutOffDate */.S3[modelConfig.model] ?? constant/* KnowledgeCutOffDate */.S3.default;
     // Find the model in the DEFAULT_MODELS array that matches the modelConfig.model
     const modelInfo = constant/* DEFAULT_MODELS */.Fv.find((m)=>m.name === modelConfig.model);
-    if (!modelInfo) {
-        throw new Error(`Model ${modelConfig.model} not found in DEFAULT_MODELS array.`);
+    var serviceProvider = "OpenAI";
+    if (modelInfo) {
+        // TODO: auto detect the providerName from the modelConfig.model
+        // Directly use the providerName from the modelInfo
+        serviceProvider = modelInfo.provider.providerName;
     }
-    // Directly use the providerName from the modelInfo
-    const serviceProvider = modelInfo.provider.providerName;
     const vars = {
         ServiceProvider: serviceProvider,
         cutoff,
@@ -10056,14 +10370,31 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             get().updateStat(message);
             get().summarizeSession();
         },
-        async onUserInput (content) {
+        async onUserInput (content, attachImages) {
             const session = get().currentSession();
             const modelConfig = session.mask.modelConfig;
             const userContent = fillTemplateWith(content, modelConfig);
             console.log("[User Input] after template: ", userContent);
-            const userMessage = createMessage({
+            let mContent = userContent;
+            if (attachImages && attachImages.length > 0) {
+                mContent = [
+                    {
+                        type: "text",
+                        text: userContent
+                    }
+                ];
+                mContent = mContent.concat(attachImages.map((url)=>{
+                    return {
+                        type: "image_url",
+                        image_url: {
+                            url: url
+                        }
+                    };
+                }));
+            }
+            let userMessage = createMessage({
                 role: "user",
-                content: userContent
+                content: mContent
             });
             const botMessage = createMessage({
                 role: "assistant",
@@ -10078,7 +10409,7 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             get().updateCurrentSession((session)=>{
                 const savedUserMessage = {
                     ...userMessage,
-                    content
+                    content: mContent
                 };
                 session.messages = session.messages.concat([
                     savedUserMessage,
@@ -10086,7 +10417,7 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
                 ]);
             });
             var api;
-            if (modelConfig.model === "gemini-pro") {
+            if (modelConfig.model.startsWith("gemini")) {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
             } else {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
@@ -10190,7 +10521,7 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             for(let i = totalMessageCount - 1, tokenCount = 0; i >= contextStartIndex && tokenCount < maxTokenThreshold; i -= 1){
                 const msg = messages[i];
                 if (!msg || msg.isError) continue;
-                tokenCount += estimateTokenLength(msg.content);
+                tokenCount += estimateTokenLength((0,utils/* getMessageTextContent */.YK)(msg));
                 reversedRecentMessages.push(msg);
             }
             // concat all messages
@@ -10222,7 +10553,7 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             const session = get().currentSession();
             const modelConfig = session.mask.modelConfig;
             var api;
-            if (modelConfig.model === "gemini-pro") {
+            if (modelConfig.model.startsWith("gemini")) {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
             } else {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
@@ -10433,7 +10764,7 @@ const ModalConfigValidator = {
         return limitNumber(x, -2, 2, 0);
     },
     temperature (x) {
-        return limitNumber(x, 0, 1, 1);
+        return limitNumber(x, 0, 2, 1);
     },
     top_p (x) {
         return limitNumber(x, 0, 1, 1);
@@ -10668,7 +10999,7 @@ var clone = __webpack_require__(25157);
 
 
 let fetchState = 0; // 0 not fetch, 1 fetching, 2 done
-const DEFAULT_OPENAI_URL = (0,client/* getClientConfig */.Z)()?.buildMode === "export" ? constant/* DEFAULT_API_HOST */.Ky : constant/* ApiPath */.L.OpenAI;
+const DEFAULT_OPENAI_URL = (0,client/* getClientConfig */.Z)()?.buildMode === "export" ? constant/* DEFAULT_API_HOST */.Ky + "/api/proxy/openai" : constant/* ApiPath */.L.OpenAI;
 const DEFAULT_ACCESS_STATE = {
     accessCode: "",
     useCustomConfig: false,
@@ -11303,12 +11634,16 @@ const useSyncStore = (0,store/* createPersistStore */.D)(DEFAULT_SYNC_STATE, (se
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Bs: () => (/* binding */ getMessageImages),
 /* harmony export */   CP: () => (/* binding */ downloadAs),
 /* harmony export */   K1: () => (/* binding */ getCSSVar),
 /* harmony export */   Ri: () => (/* binding */ selectOrCopy),
 /* harmony export */   S0: () => (/* binding */ useMobileScreen),
+/* harmony export */   Xf: () => (/* binding */ isVisionModel),
+/* harmony export */   YK: () => (/* binding */ getMessageTextContent),
 /* harmony export */   ez: () => (/* binding */ trimTopic),
 /* harmony export */   gn: () => (/* binding */ isIOS),
+/* harmony export */   hv: () => (/* binding */ compressImage),
 /* harmony export */   j2: () => (/* binding */ readFromFile),
 /* harmony export */   lx: () => (/* binding */ autoGrowTextArea),
 /* harmony export */   vQ: () => (/* binding */ copyToClipboard)
@@ -11325,7 +11660,8 @@ function trimTopic(topic) {
     // Fix an issue where double quotes still show in the Indonesian language
     // This will remove the specified punctuation from the end of the string
     // and also trim quotes from both the start and end if they exist.
-    return topic.replace(/^["“”]+|["“”]+$/g, "").replace(/[，。！？”“"、,.!?]*$/, "");
+    return topic// fix for gemini
+    .replace(/^["“”*]+|["“”*]+$/g, "").replace(/[，。！？”“"、,.!?*]*$/, "");
 }
 async function copyToClipboard(text) {
     try {
@@ -11390,6 +11726,43 @@ async function downloadAs(text, filename) {
         element.click();
         document.body.removeChild(element);
     }
+}
+function compressImage(file, maxSize) {
+    return new Promise((resolve, reject)=>{
+        const reader = new FileReader();
+        reader.onload = (readerEvent)=>{
+            const image = new Image();
+            image.onload = ()=>{
+                let canvas = document.createElement("canvas");
+                let ctx = canvas.getContext("2d");
+                let width = image.width;
+                let height = image.height;
+                let quality = 0.9;
+                let dataUrl;
+                do {
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx?.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx?.drawImage(image, 0, 0, width, height);
+                    dataUrl = canvas.toDataURL("image/jpeg", quality);
+                    if (dataUrl.length < maxSize) break;
+                    if (quality > 0.5) {
+                        // Prioritize quality reduction
+                        quality -= 0.1;
+                    } else {
+                        // Then reduce the size
+                        width *= 0.9;
+                        height *= 0.9;
+                    }
+                }while (dataUrl.length > maxSize);
+                resolve(dataUrl);
+            };
+            image.onerror = reject;
+            image.src = readerEvent.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 }
 function readFromFile() {
     return new Promise((res, rej)=>{
@@ -11492,6 +11865,34 @@ function getCSSVar(varName) {
  */ function isMacOS() {
     if (false) {}
     return false;
+}
+function getMessageTextContent(message) {
+    if (typeof message.content === "string") {
+        return message.content;
+    }
+    for (const c of message.content){
+        if (c.type === "text") {
+            return c.text ?? "";
+        }
+    }
+    return "";
+}
+function getMessageImages(message) {
+    if (typeof message.content === "string") {
+        return [];
+    }
+    const urls = [];
+    for (const c of message.content){
+        if (c.type === "image_url") {
+            urls.push(c.image_url?.url ?? "");
+        }
+    }
+    return urls;
+}
+function isVisionModel(model) {
+    return(// model.startsWith("gpt-4-vision") ||
+    // model.startsWith("gemini-pro-vision") ||
+    model.includes("vision"));
 }
 
 
@@ -11715,7 +12116,7 @@ function createSyncClient(provider, config) {
 
 
 function corsPath(path) {
-    const baseUrl = (0,_config_client__WEBPACK_IMPORTED_MODULE_0__/* .getClientConfig */ .Z)()?.isApp ? `${_constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_CORS_HOST */ .LE}` : "";
+    const baseUrl = (0,_config_client__WEBPACK_IMPORTED_MODULE_0__/* .getClientConfig */ .Z)()?.isApp ? `${_constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_API_HOST */ .Ky}` : "";
     if (!path.startsWith("/")) {
         path = "/" + path;
     }
@@ -11994,8 +12395,7 @@ const RELEASE_URL = (/* unused pure expression or super */ null && (`${REPO_URL}
 const FETCH_COMMIT_URL = (/* unused pure expression or super */ null && (`https://api.github.com/repos/${OWNER}/${REPO}/commits?per_page=1`));
 const FETCH_TAG_URL = (/* unused pure expression or super */ null && (`https://api.github.com/repos/${OWNER}/${REPO}/tags?per_page=1`));
 const RUNTIME_CONFIG_DOM = "danger-runtime-config";
-const DEFAULT_CORS_HOST = "https://a.nextweb.fun";
-const DEFAULT_API_HOST = (/* unused pure expression or super */ null && (`${DEFAULT_CORS_HOST}/api/proxy`));
+const DEFAULT_API_HOST = "https://api.nextchat.dev";
 const OPENAI_BASE_URL = "https://api.openai.com";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
 var Path;
@@ -12064,7 +12464,8 @@ const Azure = {
 };
 const Google = {
     ExampleEndpoint: "https://generativelanguage.googleapis.com/",
-    ChatPath: "v1beta/models/gemini-pro:generateContent"
+    ChatPath: "v1beta/models/gemini-pro:generateContent",
+    VisionChatPath: "v1beta/models/gemini-pro-vision:generateContent"
 };
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
 const DEFAULT_SYSTEM_TEMPLATE = (/* unused pure expression or super */ null && (`
@@ -12076,12 +12477,16 @@ Latex inline: $x^2$
 Latex block: $$e=mc^2$$
 `));
 const SUMMARIZE_MODEL = "gpt-3.5-turbo";
+const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
 const KnowledgeCutOffDate = {
     default: "2021-09",
-    "gpt-4-turbo-preview": "2023-04",
+    "gpt-4-turbo-preview": "2023-12",
     "gpt-4-1106-preview": "2023-04",
-    "gpt-4-0125-preview": "2023-04",
-    "gpt-4-vision-preview": "2023-04"
+    "gpt-4-0125-preview": "2023-12",
+    "gpt-4-vision-preview": "2023-04",
+    // After improvements,
+    // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
+    "gemini-pro": "2023-12"
 };
 const DEFAULT_MODELS = [
     {
@@ -12245,6 +12650,15 @@ const DEFAULT_MODELS = [
             providerName: "Google",
             providerType: "google"
         }
+    },
+    {
+        name: "gemini-pro-vision",
+        available: true,
+        provider: {
+            id: "google",
+            providerName: "Google",
+            providerType: "google"
+        }
     }
 ];
 const CHAT_PAGE_SIZE = 15;
@@ -12329,7 +12743,7 @@ var markdown = __webpack_require__(65322);
 // EXTERNAL MODULE: ./app/styles/highlight.scss
 var highlight = __webpack_require__(86741);
 ;// CONCATENATED MODULE: ./src-tauri/tauri.conf.json
-const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.10.1"}}');
+const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.11.2"}}');
 ;// CONCATENATED MODULE: ./app/config/build.ts
 
 const getBuildConfig = ()=>{

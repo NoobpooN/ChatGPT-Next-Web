@@ -72,6 +72,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 // drag and drop helper function
 function reorder(list, startIndex, endIndex) {
     const result = [
@@ -239,7 +240,7 @@ function ContextPromptItem(props) {
                 ]
             }),
             /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_ui_lib__WEBPACK_IMPORTED_MODULE_15__/* .Input */ .II, {
-                value: props.prompt.content,
+                value: (0,_utils__WEBPACK_IMPORTED_MODULE_19__/* .getMessageTextContent */ .YK)(props.prompt),
                 type: "text",
                 className: (_chat_module_scss__WEBPACK_IMPORTED_MODULE_23___default()["context-content"]),
                 rows: focusingInput ? 5 : 1,
@@ -273,7 +274,28 @@ function ContextPrompts(props) {
         props.updateContext((context)=>context.splice(i, 1));
     };
     const updateContextPrompt = (i, prompt)=>{
-        props.updateContext((context)=>context[i] = prompt);
+        props.updateContext((context)=>{
+            const images = (0,_utils__WEBPACK_IMPORTED_MODULE_19__/* .getMessageImages */ .Bs)(context[i]);
+            context[i] = prompt;
+            if (images.length > 0) {
+                const text = (0,_utils__WEBPACK_IMPORTED_MODULE_19__/* .getMessageTextContent */ .YK)(context[i]);
+                const newContext = [
+                    {
+                        type: "text",
+                        text
+                    }
+                ];
+                for (const img of images){
+                    newContext.push({
+                        type: "image_url",
+                        image_url: {
+                            url: img
+                        }
+                    });
+                }
+                context[i].content = newContext;
+            }
+        });
     };
     const onDragEnd = (result)=>{
         if (!result.destination) {
@@ -604,6 +626,10 @@ function MaskPage() {
 
 // Exports
 module.exports = {
+	"attach-images": "chat_attach-images__UtJds",
+	"attach-image": "chat_attach-image__5zxeG",
+	"attach-image-mask": "chat_attach-image-mask__cOlWM",
+	"delete-image": "chat_delete-image__IBtAc",
 	"chat-input-actions": "chat_chat-input-actions__mwYC_",
 	"chat-input-action": "chat_chat-input-action__DMW7Y",
 	"slide-in": "chat_slide-in__nvZgA",
@@ -641,6 +667,9 @@ module.exports = {
 	"chat-message-avatar": "chat_chat-message-avatar__3QeMq",
 	"chat-message-status": "chat_chat-message-status__zc9Ad",
 	"chat-message-item": "chat_chat-message-item__dKqMl",
+	"chat-message-item-image": "chat_chat-message-item-image__2jbb0",
+	"chat-message-item-images": "chat_chat-message-item-images__EtEM4",
+	"chat-message-item-image-multi": "chat_chat-message-item-image-multi__DOIxY",
 	"chat-message-action-date": "chat_chat-message-action-date__RsXTn",
 	"chat-input-panel": "chat_chat-input-panel__rO72m",
 	"prompt-hints": "chat_prompt-hints__VT_Oi",
@@ -649,6 +678,7 @@ module.exports = {
 	"hint-content": "chat_hint-content__y2yj4",
 	"prompt-hint-selected": "chat_prompt-hint-selected__o3vYi",
 	"chat-input-panel-inner": "chat_chat-input-panel-inner___IQHi",
+	"chat-input-panel-inner-attach": "chat_chat-input-panel-inner-attach__mZheu",
 	"chat-input": "chat_chat-input__PQ_oF",
 	"chat-input-send": "chat_chat-input-send__GFQZo"
 };

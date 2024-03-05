@@ -1092,8 +1092,8 @@ function Settings() {
                                                         })
                                                     }),
                                                     /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* ListItem */.HC, {
-                                                        title: locales/* default */.ZP.Settings.Access.Azure.ApiKey.Title,
-                                                        subTitle: locales/* default */.ZP.Settings.Access.Azure.ApiKey.SubTitle,
+                                                        title: locales/* default */.ZP.Settings.Access.Google.ApiKey.Title,
+                                                        subTitle: locales/* default */.ZP.Settings.Access.Google.ApiKey.SubTitle,
                                                         children: /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* PasswordInput */.WU, {
                                                             value: accessStore.googleApiKey,
                                                             type: "text",
@@ -1104,8 +1104,8 @@ function Settings() {
                                                         })
                                                     }),
                                                     /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* ListItem */.HC, {
-                                                        title: locales/* default */.ZP.Settings.Access.Google.ApiVerion.Title,
-                                                        subTitle: locales/* default */.ZP.Settings.Access.Google.ApiVerion.SubTitle,
+                                                        title: locales/* default */.ZP.Settings.Access.Google.ApiVersion.Title,
+                                                        subTitle: locales/* default */.ZP.Settings.Access.Google.ApiVersion.SubTitle,
                                                         children: /*#__PURE__*/ jsx_runtime_.jsx("input", {
                                                             type: "text",
                                                             value: accessStore.googleApiVersion,
