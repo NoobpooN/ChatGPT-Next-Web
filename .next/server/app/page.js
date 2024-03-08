@@ -1207,25 +1207,25 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_re
 
 /***/ }),
 
-/***/ 96302:
+/***/ 42391:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
+Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494));
 Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 49967));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 82927, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 60209, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23))
 
 /***/ }),
 
-/***/ 19870:
+/***/ 19660:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 47734, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 88709, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 7833, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 62698, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 29150, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 47734, 23))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 7833, 23));
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 29150, 23))
 
 /***/ }),
 
@@ -11707,9 +11707,7 @@ async function downloadAs(text, filename) {
         });
         if (result !== null) {
             try {
-                await window.__TAURI__.fs.writeBinaryFile(result, new Uint8Array([
-                    ...text
-                ].map((c)=>c.charCodeAt(0))));
+                await window.__TAURI__.fs.writeTextFile(result, text);
                 (0,_components_ui_lib__WEBPACK_IMPORTED_MODULE_1__/* .showToast */ .CF)(_locales__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .ZP.Download.Success);
             } catch (error) {
                 (0,_components_ui_lib__WEBPACK_IMPORTED_MODULE_1__/* .showToast */ .CF)(_locales__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .ZP.Download.Failed);
