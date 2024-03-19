@@ -240,8 +240,8 @@ var react_router_dom_production_min = __webpack_require__(99742);
 var emoji = __webpack_require__(85563);
 // EXTERNAL MODULE: ./app/config/client.ts + 2 modules
 var client = __webpack_require__(39463);
-// EXTERNAL MODULE: ./app/store/sync.ts + 1 modules
-var sync = __webpack_require__(83141);
+// EXTERNAL MODULE: ./app/store/sync.ts + 2 modules
+var sync = __webpack_require__(43904);
 // EXTERNAL MODULE: ./node_modules/nanoid/index.js + 1 modules
 var nanoid = __webpack_require__(35667);
 // EXTERNAL MODULE: ./app/store/mask.ts
@@ -839,7 +839,9 @@ function Settings() {
                                     open: showEmojiPicker,
                                     children: /*#__PURE__*/ jsx_runtime_.jsx("div", {
                                         className: (settings_module_default()).avatar,
-                                        onClick: ()=>setShowEmojiPicker(true),
+                                        onClick: ()=>{
+                                            setShowEmojiPicker(!showEmojiPicker);
+                                        },
                                         children: /*#__PURE__*/ jsx_runtime_.jsx(emoji/* Avatar */.qE, {
                                             avatar: config.avatar
                                         })

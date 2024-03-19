@@ -1,6 +1,7 @@
 {
   "/api/config": {},
-  "/api/cors/[...path]": {},
   "/api/google/[...path]": {},
-  "/api/openai/[...path]": {}
+  "/api/openai/[...path]": {},
+  "/api/upstash/[action]/[...key]": {},
+  "/api/webdav/[...path]": {}
 }

@@ -21,58 +21,6 @@
       "wasm": [],
       "assets": []
     },
-    "/api/cors/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/app/api/cors/[...path]/route.js"
-      ],
-      "name": "app/api/cors/[...path]/route",
-      "page": "/api/cors/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/cors/(?<path>.+?)$",
-          "originalSource": "/api/cors/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": []
-    },
-    "/api/google/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/app/api/google/[...path]/route.js"
-      ],
-      "name": "app/api/google/[...path]/route",
-      "page": "/api/google/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/google/(?<path>.+?)$",
-          "originalSource": "/api/google/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": [],
-      "regions": [
-        "bom1",
-        "cle1",
-        "cpt1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
-    },
     "/api/openai/[...path]/route": {
       "files": [
         "server/middleware-build-manifest.js",
@@ -110,6 +58,77 @@
         "sin1",
         "syd1"
       ]
+    },
+    "/api/google/[...path]/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/api/google/[...path]/route.js"
+      ],
+      "name": "app/api/google/[...path]/route",
+      "page": "/api/google/[...path]/route",
+      "matchers": [
+        {
+          "regexp": "^/api/google/(?<path>.+?)$",
+          "originalSource": "/api/google/[...path]"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "regions": [
+        "bom1",
+        "cle1",
+        "cpt1",
+        "gru1",
+        "hnd1",
+        "iad1",
+        "icn1",
+        "kix1",
+        "pdx1",
+        "sfo1",
+        "sin1",
+        "syd1"
+      ]
+    },
+    "/api/upstash/[action]/[...key]/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/api/upstash/[action]/[...key]/route.js"
+      ],
+      "name": "app/api/upstash/[action]/[...key]/route",
+      "page": "/api/upstash/[action]/[...key]/route",
+      "matchers": [
+        {
+          "regexp": "^/api/upstash/(?<action>[^/]+?)/(?<key>.+?)$",
+          "originalSource": "/api/upstash/[action]/[...key]"
+        }
+      ],
+      "wasm": [],
+      "assets": []
+    },
+    "/api/webdav/[...path]/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/api/webdav/[...path]/route.js"
+      ],
+      "name": "app/api/webdav/[...path]/route",
+      "page": "/api/webdav/[...path]/route",
+      "matchers": [
+        {
+          "regexp": "^/api/webdav/(?<path>.+?)$",
+          "originalSource": "/api/webdav/[...path]"
+        }
+      ],
+      "wasm": [],
+      "assets": []
     }
   },
   "version": 2

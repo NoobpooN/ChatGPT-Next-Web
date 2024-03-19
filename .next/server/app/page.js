@@ -1207,14 +1207,14 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_re
 
 /***/ }),
 
-/***/ 42391:
+/***/ 63854:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494));
 Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 49967));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 82927, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 60209, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23));
+Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494))
 
 /***/ }),
 
@@ -1928,7 +1928,7 @@ function IconButton(props) {
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(43684);
 /* harmony import */ var _locales__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(57254);
 /* harmony import */ var _ui_lib__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(24552);
-/* harmony import */ var _store_sync__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(83141);
+/* harmony import */ var _store_sync__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(43904);
 
 
 
@@ -2873,15 +2873,13 @@ function Popover(props) {
         className: (ui_lib_module_default()).popover,
         children: [
             props.children,
-            props.open && /*#__PURE__*/ (0,jsx_runtime_.jsxs)("div", {
+            props.open && /*#__PURE__*/ jsx_runtime_.jsx("div", {
+                className: (ui_lib_module_default())["popover-mask"],
+                onClick: props.onClose
+            }),
+            props.open && /*#__PURE__*/ jsx_runtime_.jsx("div", {
                 className: (ui_lib_module_default())["popover-content"],
-                children: [
-                    /*#__PURE__*/ jsx_runtime_.jsx("div", {
-                        className: (ui_lib_module_default())["popover-mask"],
-                        onClick: props.onClose
-                    }),
-                    props.content
-                ]
+                children: props.content
             })
         ]
     });
@@ -3272,7 +3270,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 ;// CONCATENATED MODULE: ./src-tauri/tauri.conf.json
-const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.11.2"}}');
+const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.11.3"}}');
 ;// CONCATENATED MODULE: ./app/config/build.ts
 
 const getBuildConfig = ()=>{
@@ -3398,7 +3396,7 @@ var Path;
 })(Path || (Path = {}));
 var ApiPath;
 (function(ApiPath) {
-    ApiPath["Cors"] = "/api/cors";
+    ApiPath["Cors"] = "";
     ApiPath["OpenAI"] = "/api/openai";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
@@ -11382,7 +11380,7 @@ const usePromptStore = (0,_utils_store__WEBPACK_IMPORTED_MODULE_3__/* .createPer
 
 /***/ }),
 
-/***/ 83141:
+/***/ 43904:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -11530,8 +11528,23 @@ var ui_lib = __webpack_require__(24552);
 var locales = __webpack_require__(57254);
 // EXTERNAL MODULE: ./app/utils/cloud/index.ts + 2 modules
 var cloud = __webpack_require__(28324);
-// EXTERNAL MODULE: ./app/utils/cors.ts
-var cors = __webpack_require__(74491);
+;// CONCATENATED MODULE: ./app/utils/cors.ts
+
+
+function corsPath(path) {
+    const baseUrl = (0,client/* getClientConfig */.Z)()?.isApp ? `${constant/* DEFAULT_API_HOST */.Ky}` : "";
+    if (baseUrl === "" && path === "") {
+        return "";
+    }
+    if (!path.startsWith("/")) {
+        path = "/" + path;
+    }
+    if (!path.endsWith("/")) {
+        path += "/";
+    }
+    return `${baseUrl}${path}`;
+}
+
 ;// CONCATENATED MODULE: ./app/store/sync.ts
 
 
@@ -11546,7 +11559,7 @@ const isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
 const DEFAULT_SYNC_STATE = {
     provider: cloud/* ProviderType */.lP.WebDAV,
     useProxy: true,
-    proxyUrl: (0,cors/* corsPath */.P)(constant/* ApiPath */.L.Cors),
+    proxyUrl: corsPath(constant/* ApiPath */.L.Cors),
     webdav: {
         endpoint: "",
         username: "",
@@ -11616,11 +11629,16 @@ const useSyncStore = (0,store/* createPersistStore */.D)(DEFAULT_SYNC_STATE, (se
         }
     }), {
     name: constant/* StoreKey */.KJ.Sync,
-    version: 1.1,
+    version: 1.2,
     migrate (persistedState, version) {
         const newState = persistedState;
         if (version < 1.1) {
             newState.upstash.username = constant/* STORAGE_KEY */.Uf;
+        }
+        if (version < 1.2) {
+            if (persistedState.proxyUrl === "/api/cors/") {
+                newState.proxyUrl = "";
+            }
         }
         return newState;
     }
@@ -11929,10 +11947,7 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./app/constant.ts
 var constant = __webpack_require__(43684);
-// EXTERNAL MODULE: ./app/utils/cors.ts
-var cors = __webpack_require__(74491);
 ;// CONCATENATED MODULE: ./app/utils/cloud/webdav.ts
-
 
 function createWebDavClient(store) {
     const folder = constant/* STORAGE_KEY */.Uf;
@@ -11942,10 +11957,9 @@ function createWebDavClient(store) {
     return {
         async check () {
             try {
-                const res = await (0,cors/* corsFetch */.l)(this.path(folder), {
+                const res = await fetch(this.path(folder, proxyUrl), {
                     method: "MKCOL",
-                    headers: this.headers(),
-                    proxyUrl
+                    headers: this.headers()
                 });
                 console.log("[WebDav] check", res.status, res.statusText);
                 return [
@@ -11963,20 +11977,18 @@ function createWebDavClient(store) {
             return false;
         },
         async get (key) {
-            const res = await (0,cors/* corsFetch */.l)(this.path(fileName), {
+            const res = await fetch(this.path(fileName, proxyUrl), {
                 method: "GET",
-                headers: this.headers(),
-                proxyUrl
+                headers: this.headers()
             });
             console.log("[WebDav] get key = ", key, res.status, res.statusText);
             return await res.text();
         },
         async set (key, value) {
-            const res = await (0,cors/* corsFetch */.l)(this.path(fileName), {
+            const res = await fetch(this.path(fileName, proxyUrl), {
                 method: "PUT",
                 headers: this.headers(),
-                body: value,
-                proxyUrl
+                body: value
             });
             console.log("[WebDav] set key = ", key, res.status, res.statusText);
         },
@@ -11986,15 +11998,26 @@ function createWebDavClient(store) {
                 authorization: `Basic ${auth}`
             };
         },
-        path (path) {
-            let url = config.endpoint;
-            if (!url.endsWith("/")) {
-                url += "/";
+        path (path, proxyUrl = "") {
+            if (!path.endsWith("/")) {
+                path += "/";
             }
             if (path.startsWith("/")) {
                 path = path.slice(1);
             }
-            return url + path;
+            if (proxyUrl.length > 0 && !proxyUrl.endsWith("/")) {
+                proxyUrl += "/";
+            }
+            let url;
+            if (proxyUrl.length > 0 || proxyUrl === "/") {
+                let u = new URL(proxyUrl + "/api/webdav/" + path);
+                // add query params
+                u.searchParams.append("endpoint", config.endpoint);
+                url = u.toString();
+            } else {
+                url = "/api/upstash/" + path + "?endpoint=" + config.endpoint;
+            }
+            return url;
         }
     };
 }
@@ -12002,7 +12025,6 @@ function createWebDavClient(store) {
 // EXTERNAL MODULE: ./app/utils/format.ts
 var format = __webpack_require__(4643);
 ;// CONCATENATED MODULE: ./app/utils/cloud/upstash.ts
-
 
 
 function createUpstashClient(store) {
@@ -12014,10 +12036,9 @@ function createUpstashClient(store) {
     return {
         async check () {
             try {
-                const res = await (0,cors/* corsFetch */.l)(this.path(`get/${storeKey}`), {
+                const res = await fetch(this.path(`get/${storeKey}`, proxyUrl), {
                     method: "GET",
-                    headers: this.headers(),
-                    proxyUrl
+                    headers: this.headers()
                 });
                 console.log("[Upstash] check", res.status, res.statusText);
                 return [
@@ -12029,21 +12050,19 @@ function createUpstashClient(store) {
             return false;
         },
         async redisGet (key) {
-            const res = await (0,cors/* corsFetch */.l)(this.path(`get/${key}`), {
+            const res = await fetch(this.path(`get/${key}`, proxyUrl), {
                 method: "GET",
-                headers: this.headers(),
-                proxyUrl
+                headers: this.headers()
             });
             console.log("[Upstash] get key = ", key, res.status, res.statusText);
             const resJson = await res.json();
             return resJson.result;
         },
         async redisSet (key, value) {
-            const res = await (0,cors/* corsFetch */.l)(this.path(`set/${key}`), {
+            const res = await fetch(this.path(`set/${key}`, proxyUrl), {
                 method: "POST",
                 headers: this.headers(),
-                body: value,
-                proxyUrl
+                body: value
             });
             console.log("[Upstash] set key = ", key, res.status, res.statusText);
         },
@@ -12069,15 +12088,26 @@ function createUpstashClient(store) {
                 Authorization: `Bearer ${config.apiKey}`
             };
         },
-        path (path) {
-            let url = config.endpoint;
-            if (!url.endsWith("/")) {
-                url += "/";
+        path (path, proxyUrl = "") {
+            if (!path.endsWith("/")) {
+                path += "/";
             }
             if (path.startsWith("/")) {
                 path = path.slice(1);
             }
-            return url + path;
+            if (proxyUrl.length > 0 && !proxyUrl.endsWith("/")) {
+                proxyUrl += "/";
+            }
+            let url;
+            if (proxyUrl.length > 0 || proxyUrl === "/") {
+                let u = new URL(proxyUrl + "/api/upstash/" + path);
+                // add query params
+                u.searchParams.append("endpoint", config.endpoint);
+                url = u.toString();
+            } else {
+                url = "/api/upstash/" + path + "?endpoint=" + config.endpoint;
+            }
+            return url;
         }
     };
 }
@@ -12096,53 +12126,6 @@ const SyncClients = {
 };
 function createSyncClient(provider, config) {
     return SyncClients[provider](config);
-}
-
-
-/***/ }),
-
-/***/ 74491:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   P: () => (/* binding */ corsPath),
-/* harmony export */   l: () => (/* binding */ corsFetch)
-/* harmony export */ });
-/* harmony import */ var _config_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(39463);
-/* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(43684);
-
-
-function corsPath(path) {
-    const baseUrl = (0,_config_client__WEBPACK_IMPORTED_MODULE_0__/* .getClientConfig */ .Z)()?.isApp ? `${_constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_API_HOST */ .Ky}` : "";
-    if (!path.startsWith("/")) {
-        path = "/" + path;
-    }
-    if (!path.endsWith("/")) {
-        path += "/";
-    }
-    return `${baseUrl}${path}`;
-}
-function corsFetch(url, options) {
-    if (!url.startsWith("http")) {
-        throw Error("[CORS Fetch] url must starts with http/https");
-    }
-    let proxyUrl = options.proxyUrl ?? corsPath(_constant__WEBPACK_IMPORTED_MODULE_1__/* .ApiPath */ .L.Cors);
-    if (!proxyUrl.endsWith("/")) {
-        proxyUrl += "/";
-    }
-    url = url.replace("://", "/");
-    const corsOptions = {
-        ...options,
-        method: "POST",
-        headers: options.method ? {
-            ...options.headers,
-            method: options.method
-        } : options.headers
-    };
-    const corsUrl = proxyUrl + url;
-    console.info("[CORS] target = ", corsUrl);
-    return fetch(corsUrl, corsOptions);
 }
 
 
@@ -12407,7 +12390,7 @@ var Path;
 })(Path || (Path = {}));
 var ApiPath;
 (function(ApiPath) {
-    ApiPath["Cors"] = "/api/cors";
+    ApiPath["Cors"] = "";
     ApiPath["OpenAI"] = "/api/openai";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
@@ -12741,7 +12724,7 @@ var markdown = __webpack_require__(65322);
 // EXTERNAL MODULE: ./app/styles/highlight.scss
 var highlight = __webpack_require__(86741);
 ;// CONCATENATED MODULE: ./src-tauri/tauri.conf.json
-const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.11.2"}}');
+const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.11.3"}}');
 ;// CONCATENATED MODULE: ./app/config/build.ts
 
 const getBuildConfig = ()=>{

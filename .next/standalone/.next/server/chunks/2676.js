@@ -365,6 +365,7 @@ function getEmojiUrl(unified, style) {
 }
 function AvatarPicker(props) {
     return /*#__PURE__*/ jsx_runtime_.jsx(dist["default"], {
+        width: "100%",
         lazyLoadEmojis: true,
         theme: dist.Theme.AUTO,
         getEmojiUrl: getEmojiUrl,

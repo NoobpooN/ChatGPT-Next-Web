@@ -1,8 +1,8 @@
-// File: /Volumes/D/github/ChatGPT-Next-Web/app/api/cors/[...path]/route.ts
-import * as entry from '../../../../../../app/api/cors/[...path]/route.js'
+// File: /Volumes/D/github/ChatGPT-Next-Web/app/api/upstash/[action]/[...key]/route.ts
+import * as entry from '../../../../../../../app/api/upstash/[action]/[...key]/route.js'
 import type { NextRequest } from 'next/server.js'
 
-type TEntry = typeof import('../../../../../../app/api/cors/[...path]/route.js')
+type TEntry = typeof import('../../../../../../../app/api/upstash/[action]/[...key]/route.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{
