@@ -1207,7 +1207,7 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_re
 
 /***/ }),
 
-/***/ 63854:
+/***/ 96302:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
 Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 49967));
@@ -11906,9 +11906,12 @@ function getMessageImages(message) {
     return urls;
 }
 function isVisionModel(model) {
-    return(// model.startsWith("gpt-4-vision") ||
-    // model.startsWith("gemini-pro-vision") ||
-    model.includes("vision"));
+    // Note: This is a better way using the TypeScript feature instead of `&&` or `||` (ts v5.5.0-dev.20240314 I've been using)
+    const visionKeywords = [
+        "vision",
+        "claude-3"
+    ];
+    return visionKeywords.some((keyword)=>model.includes(keyword));
 }
 
 

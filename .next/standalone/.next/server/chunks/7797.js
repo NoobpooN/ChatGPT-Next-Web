@@ -1891,6 +1891,8 @@ function useSubmitHandler() {
         };
     }, []);
     const shouldSubmit = (e)=>{
+        // Fix Chinese input method "Enter" on Safari
+        if (e.keyCode == 229) return false;
         if (e.key !== "Enter") return false;
         if (e.key === "Enter" && (e.nativeEvent.isComposing || isComposing.current)) return false;
         return config.submitKey === store/* SubmitKey */.mQ.AltEnter && e.altKey || config.submitKey === store/* SubmitKey */.mQ.CtrlEnter && e.ctrlKey || config.submitKey === store/* SubmitKey */.mQ.ShiftEnter && e.shiftKey || config.submitKey === store/* SubmitKey */.mQ.MetaEnter && e.metaKey || config.submitKey === store/* SubmitKey */.mQ.Enter && !e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey;

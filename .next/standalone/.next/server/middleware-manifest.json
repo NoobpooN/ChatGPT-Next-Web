@@ -92,25 +92,6 @@
         "syd1"
       ]
     },
-    "/api/upstash/[action]/[...key]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/app/api/upstash/[action]/[...key]/route.js"
-      ],
-      "name": "app/api/upstash/[action]/[...key]/route",
-      "page": "/api/upstash/[action]/[...key]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/upstash/(?<action>[^/]+?)/(?<key>.+?)$",
-          "originalSource": "/api/upstash/[action]/[...key]"
-        }
-      ],
-      "wasm": [],
-      "assets": []
-    },
     "/api/webdav/[...path]/route": {
       "files": [
         "server/middleware-build-manifest.js",
@@ -125,6 +106,25 @@
         {
           "regexp": "^/api/webdav/(?<path>.+?)$",
           "originalSource": "/api/webdav/[...path]"
+        }
+      ],
+      "wasm": [],
+      "assets": []
+    },
+    "/api/upstash/[action]/[...key]/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/api/upstash/[action]/[...key]/route.js"
+      ],
+      "name": "app/api/upstash/[action]/[...key]/route",
+      "page": "/api/upstash/[action]/[...key]/route",
+      "matchers": [
+        {
+          "regexp": "^/api/upstash/(?<action>[^/]+?)/(?<key>.+?)$",
+          "originalSource": "/api/upstash/[action]/[...key]"
         }
       ],
       "wasm": [],
