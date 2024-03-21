@@ -1561,11 +1561,11 @@ function ImagePreviewer(props) {
                                 children: [
                                     /*#__PURE__*/ jsx_runtime_.jsx("div", {
                                         className: (exporter_module_default())["main-title"],
-                                        children: "NextChat"
+                                        children: "人工智障"
                                     }),
                                     /*#__PURE__*/ jsx_runtime_.jsx("div", {
                                         className: (exporter_module_default())["sub-title"],
-                                        children: "github.com/Yidadaa/ChatGPT-Next-Web"
+                                        children: mask.modelConfig.model
                                     }),
                                     /*#__PURE__*/ (0,jsx_runtime_.jsxs)("div", {
                                         className: (exporter_module_default()).icons,

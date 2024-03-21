@@ -1,7 +1,7 @@
 {
-  "/api/google/[...path]": {},
-  "/api/openai/[...path]": {},
-  "/api/upstash/[action]/[...key]": {},
   "/api/config": {},
+  "/api/google/[...path]": {},
+  "/api/upstash/[action]/[...key]": {},
+  "/api/openai/[...path]": {},
   "/api/webdav/[...path]": {}
 }
