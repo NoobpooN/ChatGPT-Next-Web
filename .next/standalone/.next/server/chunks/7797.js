@@ -1062,7 +1062,8 @@ function MessageSelector(props) {
                                 className: (message_selector_module_default()).checkbox,
                                 children: /*#__PURE__*/ jsx_runtime_.jsx("input", {
                                     type: "checkbox",
-                                    checked: isSelected
+                                    checked: isSelected,
+                                    readOnly: true
                                 })
                             })
                         ]
@@ -1561,7 +1562,7 @@ function ImagePreviewer(props) {
                                 children: [
                                     /*#__PURE__*/ jsx_runtime_.jsx("div", {
                                         className: (exporter_module_default())["main-title"],
-                                        children: "人工智障"
+                                        children: "Artificial Imbecile"
                                     }),
                                     /*#__PURE__*/ jsx_runtime_.jsx("div", {
                                         className: (exporter_module_default())["sub-title"],

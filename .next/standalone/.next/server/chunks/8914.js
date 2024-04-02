@@ -141,8 +141,21 @@ function escapeDollarNumber(text) {
     }
     return escapedText;
 }
+function escapeBrackets(text) {
+    const pattern = /(```[\s\S]*?```|`.*?`)|\\\[([\s\S]*?[^\\])\\\]|\\\((.*?)\\\)/g;
+    return text.replace(pattern, (match, codeBlock, squareBracket, roundBracket)=>{
+        if (codeBlock) {
+            return codeBlock;
+        } else if (squareBracket) {
+            return `$$${squareBracket}$$`;
+        } else if (roundBracket) {
+            return `$${roundBracket}$`;
+        }
+        return match;
+    });
+}
 function _MarkDownContent(props) {
-    const escapedContent = (0,react__WEBPACK_IMPORTED_MODULE_2__.useMemo)(()=>escapeDollarNumber(props.content), [
+    const escapedContent = (0,react__WEBPACK_IMPORTED_MODULE_2__.useMemo)(()=>escapeBrackets(escapeDollarNumber(props.content)), [
         props.content
     ]);
     return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(react_markdown__WEBPACK_IMPORTED_MODULE_8__/* .ReactMarkdown */ .D, {

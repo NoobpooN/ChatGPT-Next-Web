@@ -14,13 +14,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(56786);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _icons_delete_svg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(77360);
-/* harmony import */ var _home_module_scss__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(83465);
-/* harmony import */ var _home_module_scss__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_home_module_scss__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var _hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(41423);
+/* harmony import */ var _home_module_scss__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(83465);
+/* harmony import */ var _home_module_scss__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_home_module_scss__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var _hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(41423);
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1075);
 /* harmony import */ var _locales__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(57254);
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(99742);
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_router_dom__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(99742);
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_router_dom__WEBPACK_IMPORTED_MODULE_9__);
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(43684);
 /* harmony import */ var _mask__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(94417);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(18038);
@@ -50,11 +50,12 @@ function ChatItem(props) {
     }, [
         props.selected
     ]);
-    return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_9__/* .Draggable */ ._l, {
+    const { pathname: currentPath } = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_9__.useLocation)();
+    return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_10__/* .Draggable */ ._l, {
         draggableId: `${props.id}`,
         index: props.index,
         children: (provided)=>/*#__PURE__*/ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                className: `${(_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item"])} ${props.selected && (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-selected"])}`,
+                className: `${(_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item"])} ${props.selected && (currentPath === _constant__WEBPACK_IMPORTED_MODULE_4__/* .Path */ .y$.Chat || currentPath === _constant__WEBPACK_IMPORTED_MODULE_4__/* .Path */ .y$.Home) && (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-selected"])}`,
                 onClick: props.onClick,
                 ref: (ele)=>{
                     draggableRef.current = ele;
@@ -65,35 +66,35 @@ function ChatItem(props) {
                 title: `${props.title}\n${_locales__WEBPACK_IMPORTED_MODULE_3__/* ["default"] */ .ZP.ChatItem.ChatItemCount(props.count)}`,
                 children: [
                     props.narrow ? /*#__PURE__*/ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                        className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-narrow"]),
+                        className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-narrow"]),
                         children: [
                             /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx("div", {
-                                className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-avatar"]) + " no-dark",
+                                className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-avatar"]) + " no-dark",
                                 children: /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_mask__WEBPACK_IMPORTED_MODULE_5__.MaskAvatar, {
                                     avatar: props.mask.avatar,
                                     model: props.mask.modelConfig.model
                                 })
                             }),
                             /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx("div", {
-                                className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-narrow-count"]),
+                                className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-narrow-count"]),
                                 children: props.count
                             })
                         ]
                     }) : /*#__PURE__*/ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                         children: [
                             /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx("div", {
-                                className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-title"]),
+                                className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-title"]),
                                 children: props.title
                             }),
                             /*#__PURE__*/ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                                className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-info"]),
+                                className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-info"]),
                                 children: [
                                     /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx("div", {
-                                        className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-count"]),
+                                        className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-count"]),
                                         children: _locales__WEBPACK_IMPORTED_MODULE_3__/* ["default"] */ .ZP.ChatItem.ChatItemCount(props.count)
                                     }),
                                     /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx("div", {
-                                        className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-date"]),
+                                        className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-date"]),
                                         children: props.time
                                     })
                                 ]
@@ -101,7 +102,7 @@ function ChatItem(props) {
                         ]
                     }),
                     /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx("div", {
-                        className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-item-delete"]),
+                        className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-item-delete"]),
                         onClickCapture: (e)=>{
                             props.onDelete?.();
                             e.preventDefault();
@@ -121,7 +122,7 @@ function ChatList(props) {
             state.moveSession
         ]);
     const chatStore = (0,_store__WEBPACK_IMPORTED_MODULE_2__/* .useChatStore */ .aK)();
-    const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_11__.useNavigate)();
+    const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_9__.useNavigate)();
     const isMobileScreen = (0,_utils__WEBPACK_IMPORTED_MODULE_8__/* .useMobileScreen */ .S0)();
     const onDragEnd = (result)=>{
         const { destination, source } = result;
@@ -133,12 +134,12 @@ function ChatList(props) {
         }
         moveSession(source.index, destination.index);
     };
-    return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_9__/* .DragDropContext */ .Z5, {
+    return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_10__/* .DragDropContext */ .Z5, {
         onDragEnd: onDragEnd,
-        children: /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_9__/* .Droppable */ .bK, {
+        children: /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(_hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_10__/* .Droppable */ .bK, {
             droppableId: "chat-list",
             children: (provided)=>/*#__PURE__*/ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                    className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_10___default()["chat-list"]),
+                    className: (_home_module_scss__WEBPACK_IMPORTED_MODULE_11___default()["chat-list"]),
                     ref: provided.innerRef,
                     ...provided.droppableProps,
                     children: [

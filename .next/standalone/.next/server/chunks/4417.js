@@ -376,7 +376,16 @@ function MaskPage() {
     const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_25__.useNavigate)();
     const maskStore = (0,_store_mask__WEBPACK_IMPORTED_MODULE_12__/* .useMaskStore */ .Zy)();
     const chatStore = (0,_store__WEBPACK_IMPORTED_MODULE_13__/* .useChatStore */ .aK)();
-    const [filterLang, setFilterLang] = (0,react__WEBPACK_IMPORTED_MODULE_18__.useState)();
+    const [filterLang, setFilterLang] = (0,react__WEBPACK_IMPORTED_MODULE_18__.useState)(localStorage.getItem("Mask-language"));
+    (0,react__WEBPACK_IMPORTED_MODULE_18__.useEffect)(()=>{
+        if (filterLang) {
+            localStorage.setItem("Mask-language", filterLang);
+        } else {
+            localStorage.removeItem("Mask-language");
+        }
+    }, [
+        filterLang
+    ]);
     const allMasks = maskStore.getAll().filter((m)=>!filterLang || m.lang === filterLang);
     const [searchMasks, setSearchMasks] = (0,react__WEBPACK_IMPORTED_MODULE_18__.useState)([]);
     const [searchText, setSearchText] = (0,react__WEBPACK_IMPORTED_MODULE_18__.useState)("");

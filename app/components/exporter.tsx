@@ -544,7 +544,7 @@ export function ImagePreviewer(props: {
           </div>
 
           <div>
-            <div className={styles["main-title"]}>人工智障</div>
+            <div className={styles["main-title"]}>Artificial Imbecile</div>
             <div className={styles["sub-title"]}>{mask.modelConfig.model}</div>
             <div className={styles["icons"]}>
               <ExportAvatar avatar={config.avatar} />

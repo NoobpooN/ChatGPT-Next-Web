@@ -1207,25 +1207,25 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_re
 
 /***/ }),
 
-/***/ 42391:
+/***/ 96302:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494));
 Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 49967));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 82927, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 60209, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23));
+Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494))
 
 /***/ }),
 
-/***/ 19660:
+/***/ 67510:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 47734, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 88709, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 62698, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 7833, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 29150, 23))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 29150, 23));
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 47734, 23))
 
 /***/ }),
 
@@ -1360,6 +1360,9 @@ class ChatGPTApi {
                     if (finished || controller.signal.aborted) {
                         responseText += remainText;
                         console.log("[Response Animation] finished");
+                        if (responseText?.length === 0) {
+                            options.onError?.(new Error("empty response from server"));
+                        }
                         return;
                     }
                     if (remainText.length > 0) {
@@ -1416,12 +1419,18 @@ class ChatGPTApi {
                         const text = msg.data;
                         try {
                             const json = JSON.parse(text);
-                            const delta = json.choices[0]?.delta?.content;
+                            const choices = json.choices;
+                            const delta = choices[0]?.delta?.content;
+                            const textmoderation = json?.prompt_filter_results;
                             if (delta) {
                                 remainText += delta;
                             }
+                            if (textmoderation && textmoderation.length > 0 && constant/* ServiceProvider */.UT.Azure) {
+                                const contentFilterResults = textmoderation[0]?.content_filter_results;
+                                console.log(`[${constant/* ServiceProvider */.UT.Azure}] [Text Moderation] flagged categories result:`, contentFilterResults);
+                            }
                         } catch (e) {
-                            console.error("[Request] parse error", text);
+                            console.error("[Request] parse error", text, msg);
                         }
                     },
                     onclose () {
@@ -10568,7 +10577,8 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
                 api.llm.chat({
                     messages: topicMessages,
                     config: {
-                        model: getSummarizeModel(session.mask.modelConfig.model)
+                        model: getSummarizeModel(session.mask.modelConfig.model),
+                        stream: false
                     },
                     onFinish (message) {
                         get().updateCurrentSession((session)=>session.topic = message.length > 0 ? (0,utils/* trimTopic */.ez)(message) : DEFAULT_TOPIC);
@@ -10587,6 +10597,9 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             const lastSummarizeIndex = session.messages.length;
             console.log("[Chat History] ", toBeSummarizedMsgs, historyMsgLength, modelConfig.compressMessageLengthThreshold);
             if (historyMsgLength > modelConfig.compressMessageLengthThreshold && modelConfig.sendMemory) {
+                /** Destruct max_tokens while summarizing
+           * this param is just shit
+           **/ const { max_tokens, ...modelcfg } = modelConfig;
                 api.llm.chat({
                     messages: toBeSummarizedMsgs.concat(createMessage({
                         role: "system",
@@ -10594,7 +10607,7 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
                         date: ""
                     })),
                     config: {
-                        ...modelConfig,
+                        ...modelcfg,
                         stream: true,
                         model: getSummarizeModel(session.mask.modelConfig.model)
                     },
@@ -11964,16 +11977,18 @@ function createWebDavClient(store) {
                     method: "MKCOL",
                     headers: this.headers()
                 });
-                console.log("[WebDav] check", res.status, res.statusText);
-                return [
+                const success = [
                     201,
                     200,
                     404,
+                    405,
                     301,
                     302,
                     307,
                     308
                 ].includes(res.status);
+                console.log(`[WebDav] check ${success ? "success" : "failed"}, ${res.status} ${res.statusText}`);
+                return success;
             } catch (e) {
                 console.error("[WebDav] failed to check", e);
             }
