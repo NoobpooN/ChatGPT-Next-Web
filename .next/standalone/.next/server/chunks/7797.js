@@ -1081,8 +1081,8 @@ var image_default = /*#__PURE__*/__webpack_require__.n(next_image);
 var lib = __webpack_require__(61311);
 // EXTERNAL MODULE: ./app/config/client.ts + 2 modules
 var client = __webpack_require__(39463);
-// EXTERNAL MODULE: ./app/client/api.ts + 3 modules
-var client_api = __webpack_require__(10616);
+// EXTERNAL MODULE: ./app/client/api.ts + 4 modules
+var client_api = __webpack_require__(75224);
 ;// CONCATENATED MODULE: ./app/components/exporter.tsx
 /* eslint-disable @next/next/no-img-element */ 
 
@@ -1352,6 +1352,8 @@ function PreviewActions(props) {
         var api;
         if (config.modelConfig.model.startsWith("gemini")) {
             api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
+        } else if (config.modelConfig.model.startsWith("claude")) {
+            api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.Claude);
         } else {
             api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
         }

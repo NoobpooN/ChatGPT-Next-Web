@@ -30,7 +30,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _icons_drag_svg__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(3276);
 /* harmony import */ var _store_mask__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(73706);
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(1075);
-/* harmony import */ var _client_api__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(10616);
+/* harmony import */ var _client_api__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(75224);
 /* harmony import */ var _ui_lib__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(24552);
 /* harmony import */ var _emoji__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(85563);
 /* harmony import */ var _locales__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(57254);

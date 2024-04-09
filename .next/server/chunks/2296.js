@@ -1021,7 +1021,7 @@ function Settings() {
                                                         }, k))
                                                 })
                                             }),
-                                            accessStore.provider === "OpenAI" ? /*#__PURE__*/ (0,jsx_runtime_.jsxs)(jsx_runtime_.Fragment, {
+                                            accessStore.provider === constant/* ServiceProvider */.UT.OpenAI && /*#__PURE__*/ (0,jsx_runtime_.jsxs)(jsx_runtime_.Fragment, {
                                                 children: [
                                                     /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* ListItem */.HC, {
                                                         title: locales/* default */.ZP.Settings.Access.OpenAI.Endpoint.Title,
@@ -1046,7 +1046,8 @@ function Settings() {
                                                         })
                                                     })
                                                 ]
-                                            }) : accessStore.provider === "Azure" ? /*#__PURE__*/ (0,jsx_runtime_.jsxs)(jsx_runtime_.Fragment, {
+                                            }),
+                                            accessStore.provider === constant/* ServiceProvider */.UT.Azure && /*#__PURE__*/ (0,jsx_runtime_.jsxs)(jsx_runtime_.Fragment, {
                                                 children: [
                                                     /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* ListItem */.HC, {
                                                         title: locales/* default */.ZP.Settings.Access.Azure.Endpoint.Title,
@@ -1081,7 +1082,8 @@ function Settings() {
                                                         })
                                                     })
                                                 ]
-                                            }) : accessStore.provider === "Google" ? /*#__PURE__*/ (0,jsx_runtime_.jsxs)(jsx_runtime_.Fragment, {
+                                            }),
+                                            accessStore.provider === constant/* ServiceProvider */.UT.Google && /*#__PURE__*/ (0,jsx_runtime_.jsxs)(jsx_runtime_.Fragment, {
                                                 children: [
                                                     /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* ListItem */.HC, {
                                                         title: locales/* default */.ZP.Settings.Access.Google.Endpoint.Title,
@@ -1116,7 +1118,43 @@ function Settings() {
                                                         })
                                                     })
                                                 ]
-                                            }) : null
+                                            }),
+                                            accessStore.provider === constant/* ServiceProvider */.UT.Anthropic && /*#__PURE__*/ (0,jsx_runtime_.jsxs)(jsx_runtime_.Fragment, {
+                                                children: [
+                                                    /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* ListItem */.HC, {
+                                                        title: locales/* default */.ZP.Settings.Access.Anthropic.Endpoint.Title,
+                                                        subTitle: locales/* default */.ZP.Settings.Access.Anthropic.Endpoint.SubTitle + constant/* Anthropic */.YU.ExampleEndpoint,
+                                                        children: /*#__PURE__*/ jsx_runtime_.jsx("input", {
+                                                            type: "text",
+                                                            value: accessStore.anthropicUrl,
+                                                            placeholder: constant/* Anthropic */.YU.ExampleEndpoint,
+                                                            onChange: (e)=>accessStore.update((access)=>access.anthropicUrl = e.currentTarget.value)
+                                                        })
+                                                    }),
+                                                    /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* ListItem */.HC, {
+                                                        title: locales/* default */.ZP.Settings.Access.Anthropic.ApiKey.Title,
+                                                        subTitle: locales/* default */.ZP.Settings.Access.Anthropic.ApiKey.SubTitle,
+                                                        children: /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* PasswordInput */.WU, {
+                                                            value: accessStore.anthropicApiKey,
+                                                            type: "text",
+                                                            placeholder: locales/* default */.ZP.Settings.Access.Anthropic.ApiKey.Placeholder,
+                                                            onChange: (e)=>{
+                                                                accessStore.update((access)=>access.anthropicApiKey = e.currentTarget.value);
+                                                            }
+                                                        })
+                                                    }),
+                                                    /*#__PURE__*/ jsx_runtime_.jsx(ui_lib/* ListItem */.HC, {
+                                                        title: locales/* default */.ZP.Settings.Access.Anthropic.ApiVerion.Title,
+                                                        subTitle: locales/* default */.ZP.Settings.Access.Anthropic.ApiVerion.SubTitle,
+                                                        children: /*#__PURE__*/ jsx_runtime_.jsx("input", {
+                                                            type: "text",
+                                                            value: accessStore.anthropicApiVersion,
+                                                            placeholder: constant/* Anthropic */.YU.Vision,
+                                                            onChange: (e)=>accessStore.update((access)=>access.anthropicApiVersion = e.currentTarget.value)
+                                                        })
+                                                    })
+                                                ]
+                                            })
                                         ]
                                     })
                                 ]

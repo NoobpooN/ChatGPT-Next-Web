@@ -1207,14 +1207,14 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_re
 
 /***/ }),
 
-/***/ 96302:
+/***/ 42391:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
+Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494));
 Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 49967));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 82927, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 60209, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 78124, 23))
 
 /***/ }),
 
@@ -1229,7 +1229,7 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_
 
 /***/ }),
 
-/***/ 10616:
+/***/ 75224:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -1330,12 +1330,7 @@ class ChatGPTApi {
         };
         // add max_tokens to vision model
         if (visionModel) {
-            Object.defineProperty(requestPayload, "max_tokens", {
-                enumerable: true,
-                configurable: true,
-                writable: true,
-                value: modelConfig.max_tokens
-            });
+            requestPayload["max_tokens"] = Math.max(modelConfig.max_tokens, 4000);
         }
         console.log("[Request] openai payload: ", requestPayload);
         const shouldStream = !!options.config.stream;
@@ -1750,7 +1745,263 @@ function ensureProperEnding(str) {
     return str;
 }
 
+;// CONCATENATED MODULE: ./app/client/platforms/anthropic.ts
+
+
+
+
+
+
+
+
+const ClaudeMapper = {
+    assistant: "assistant",
+    user: "user",
+    system: "user"
+};
+const keys = (/* unused pure expression or super */ null && ([
+    "claude-2, claude-instant-1"
+]));
+class ClaudeApi {
+    extractMessage(res) {
+        console.log("[Response] claude response: ", res);
+        return res?.content?.[0]?.text;
+    }
+    async chat(options) {
+        const visionModel = (0,utils/* isVisionModel */.Xf)(options.config.model);
+        const accessStore = store/* useAccessStore */._X.getState();
+        const shouldStream = !!options.config.stream;
+        const modelConfig = {
+            ...store/* useAppConfig */.MG.getState().modelConfig,
+            ...store/* useChatStore */.aK.getState().currentSession().mask.modelConfig,
+            ...{
+                model: options.config.model
+            }
+        };
+        const messages = [
+            ...options.messages
+        ];
+        const keys = [
+            "system",
+            "user"
+        ];
+        // roles must alternate between "user" and "assistant" in claude, so add a fake assistant message between two user messages
+        for(let i = 0; i < messages.length - 1; i++){
+            const message = messages[i];
+            const nextMessage = messages[i + 1];
+            if (keys.includes(message.role) && keys.includes(nextMessage.role)) {
+                messages[i] = [
+                    message,
+                    {
+                        role: "assistant",
+                        content: ";"
+                    }
+                ];
+            }
+        }
+        const prompt = messages.flat().filter((v)=>{
+            if (!v.content) return false;
+            if (typeof v.content === "string" && !v.content.trim()) return false;
+            return true;
+        }).map((v)=>{
+            const { role, content } = v;
+            const insideRole = ClaudeMapper[role] ?? "user";
+            if (!visionModel || typeof content === "string") {
+                return {
+                    role: insideRole,
+                    content: (0,utils/* getMessageTextContent */.YK)(v)
+                };
+            }
+            return {
+                role: insideRole,
+                content: content.filter((v)=>v.image_url || v.text).map(({ type, text, image_url })=>{
+                    if (type === "text") {
+                        return {
+                            type,
+                            text: text
+                        };
+                    }
+                    const { url = "" } = image_url || {};
+                    const colonIndex = url.indexOf(":");
+                    const semicolonIndex = url.indexOf(";");
+                    const comma = url.indexOf(",");
+                    const mimeType = url.slice(colonIndex + 1, semicolonIndex);
+                    const encodeType = url.slice(semicolonIndex + 1, comma);
+                    const data = url.slice(comma + 1);
+                    return {
+                        type: "image",
+                        source: {
+                            type: encodeType,
+                            media_type: mimeType,
+                            data
+                        }
+                    };
+                })
+            };
+        });
+        const requestBody = {
+            messages: prompt,
+            stream: shouldStream,
+            model: modelConfig.model,
+            max_tokens: modelConfig.max_tokens,
+            temperature: modelConfig.temperature,
+            top_p: modelConfig.top_p,
+            // top_k: modelConfig.top_k,
+            top_k: 5
+        };
+        const path = this.path(constant/* Anthropic */.YU.ChatPath);
+        const controller = new AbortController();
+        options.onController?.(controller);
+        const payload = {
+            method: "POST",
+            body: JSON.stringify(requestBody),
+            signal: controller.signal,
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "x-api-key": accessStore.anthropicApiKey,
+                "anthropic-version": accessStore.anthropicApiVersion,
+                Authorization: getAuthKey(accessStore.anthropicApiKey)
+            }
+        };
+        if (shouldStream) {
+            try {
+                const context = {
+                    text: "",
+                    finished: false
+                };
+                const finish = ()=>{
+                    if (!context.finished) {
+                        options.onFinish(context.text);
+                        context.finished = true;
+                    }
+                };
+                controller.signal.onabort = finish;
+                (0,esm_fetch/* fetchEventSource */.L)(path, {
+                    ...payload,
+                    async onopen (res) {
+                        const contentType = res.headers.get("content-type");
+                        console.log("response content type: ", contentType);
+                        if (contentType?.startsWith("text/plain")) {
+                            context.text = await res.clone().text();
+                            return finish();
+                        }
+                        if (!res.ok || !res.headers.get("content-type")?.startsWith(esm_fetch/* EventStreamContentType */.a) || res.status !== 200) {
+                            const responseTexts = [
+                                context.text
+                            ];
+                            let extraInfo = await res.clone().text();
+                            try {
+                                const resJson = await res.clone().json();
+                                extraInfo = (0,format/* prettyObject */.B)(resJson);
+                            } catch  {}
+                            if (res.status === 401) {
+                                responseTexts.push(locales/* default */.ZP.Error.Unauthorized);
+                            }
+                            if (extraInfo) {
+                                responseTexts.push(extraInfo);
+                            }
+                            context.text = responseTexts.join("\n\n");
+                            return finish();
+                        }
+                    },
+                    onmessage (msg) {
+                        let chunkJson;
+                        try {
+                            chunkJson = JSON.parse(msg.data);
+                        } catch (e) {
+                            console.error("[Response] parse error", msg.data);
+                        }
+                        if (!chunkJson || chunkJson.type === "content_block_stop") {
+                            return finish();
+                        }
+                        const { delta } = chunkJson;
+                        if (delta?.text) {
+                            context.text += delta.text;
+                            options.onUpdate?.(context.text, delta.text);
+                        }
+                    },
+                    onclose () {
+                        finish();
+                    },
+                    onerror (e) {
+                        options.onError?.(e);
+                        throw e;
+                    },
+                    openWhenHidden: true
+                });
+            } catch (e) {
+                console.error("failed to chat", e);
+                options.onError?.(e);
+            }
+        } else {
+            try {
+                controller.signal.onabort = ()=>options.onFinish("");
+                const res = await fetch(path, payload);
+                const resJson = await res.json();
+                const message = this.extractMessage(resJson);
+                options.onFinish(message);
+            } catch (e) {
+                console.error("failed to chat", e);
+                options.onError?.(e);
+            }
+        }
+    }
+    async usage() {
+        return {
+            used: 0,
+            total: 0
+        };
+    }
+    async models() {
+        // const provider = {
+        //   id: "anthropic",
+        //   providerName: "Anthropic",
+        //   providerType: "anthropic",
+        // };
+        return [];
+    }
+    path(path) {
+        const accessStore = store/* useAccessStore */._X.getState();
+        let baseUrl = accessStore.anthropicUrl;
+        // if endpoint is empty, use default endpoint
+        if (baseUrl.trim().length === 0) {
+            const isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
+            baseUrl = isApp ? constant/* DEFAULT_API_HOST */.Ky + "/api/proxy/anthropic" : constant/* ApiPath */.L.Anthropic;
+        }
+        if (!baseUrl.startsWith("http") && !baseUrl.startsWith("/api")) {
+            baseUrl = "https://" + baseUrl;
+        }
+        baseUrl = trimEnd(baseUrl, "/");
+        return `${baseUrl}/${path}`;
+    }
+}
+function trimEnd(s, end = " ") {
+    if (end.length === 0) return s;
+    while(s.endsWith(end)){
+        s = s.slice(0, -end.length);
+    }
+    return s;
+}
+function bearer(value) {
+    return `Bearer ${value.trim()}`;
+}
+function getAuthKey(apiKey = "") {
+    const accessStore = store/* useAccessStore */._X.getState();
+    const isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
+    let authKey = "";
+    if (apiKey) {
+        // use user's api key first
+        authKey = bearer(apiKey);
+    } else if (accessStore.enabledAccessControl() && !isApp && !!accessStore.accessCode) {
+        // or use access code
+        authKey = bearer(constant/* ACCESS_CODE_PREFIX */.TW + accessStore.accessCode);
+    }
+    return authKey;
+}
+
 ;// CONCATENATED MODULE: ./app/client/api.ts
+
 
 
 
@@ -1769,11 +2020,16 @@ class LLMApi {
 }
 class ClientApi {
     constructor(provider = constant/* ModelProvider */.k8.GPT){
-        if (provider === constant/* ModelProvider */.k8.GeminiPro) {
-            this.llm = new GeminiProApi();
-            return;
+        switch(provider){
+            case constant/* ModelProvider */.k8.GeminiPro:
+                this.llm = new GeminiProApi();
+                break;
+            case constant/* ModelProvider */.k8.Claude:
+                this.llm = new ClaudeApi();
+                break;
+            default:
+                this.llm = new ChatGPTApi();
         }
-        this.llm = new ChatGPTApi();
     }
     config() {}
     prompts() {}
@@ -2549,8 +2805,8 @@ function AuthPage() {
     });
 }
 
-// EXTERNAL MODULE: ./app/client/api.ts + 3 modules
-var client_api = __webpack_require__(10616);
+// EXTERNAL MODULE: ./app/client/api.ts + 4 modules
+var client_api = __webpack_require__(75224);
 ;// CONCATENATED MODULE: ./app/components/home.tsx
 /* __next_internal_client_entry_do_not_use__ Loading,useSwitchTheme,useLoadData,Home auto */ 
 __webpack_require__(81757);
@@ -2724,6 +2980,8 @@ function useLoadData() {
     var api;
     if (config.modelConfig.model.startsWith("gemini")) {
         api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
+    } else if (config.modelConfig.model.startsWith("claude")) {
+        api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.Claude);
     } else {
         api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
     }
@@ -3365,6 +3623,7 @@ function queryMeta(key, defaultValue) {
 /* harmony export */   TW: () => (/* binding */ ACCESS_CODE_PREFIX),
 /* harmony export */   UT: () => (/* binding */ ServiceProvider),
 /* harmony export */   Uf: () => (/* binding */ STORAGE_KEY),
+/* harmony export */   YU: () => (/* binding */ Anthropic),
 /* harmony export */   bH: () => (/* binding */ NARROW_SIDEBAR_WIDTH),
 /* harmony export */   cr: () => (/* binding */ RELEASE_URL),
 /* harmony export */   dJ: () => (/* binding */ FileName),
@@ -3381,7 +3640,7 @@ function queryMeta(key, defaultValue) {
 /* harmony export */   ym: () => (/* binding */ SlotID),
 /* harmony export */   yp: () => (/* binding */ DEFAULT_SYSTEM_TEMPLATE)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, RUNTIME_CONFIG_DOM, GEMINI_BASE_URL, MAX_RENDER_MSG_COUNT */
+/* unused harmony exports OWNER, REPO, RUNTIME_CONFIG_DOM, ANTHROPIC_BASE_URL, GEMINI_BASE_URL, MAX_RENDER_MSG_COUNT */
 const OWNER = "Yidadaa";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
@@ -3393,6 +3652,7 @@ const FETCH_TAG_URL = `https://api.github.com/repos/${OWNER}/${REPO}/tags?per_pa
 const RUNTIME_CONFIG_DOM = "danger-runtime-config";
 const DEFAULT_API_HOST = "https://api.nextchat.dev";
 const OPENAI_BASE_URL = "https://api.openai.com";
+const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
 var Path;
 (function(Path) {
@@ -3407,6 +3667,7 @@ var ApiPath;
 (function(ApiPath) {
     ApiPath["Cors"] = "";
     ApiPath["OpenAI"] = "/api/openai";
+    ApiPath["Anthropic"] = "/api/anthropic";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
 (function(SlotID) {
@@ -3443,12 +3704,20 @@ var ServiceProvider;
     ServiceProvider["OpenAI"] = "OpenAI";
     ServiceProvider["Azure"] = "Azure";
     ServiceProvider["Google"] = "Google";
+    ServiceProvider["Anthropic"] = "Anthropic";
 })(ServiceProvider || (ServiceProvider = {}));
 var ModelProvider;
 (function(ModelProvider) {
     ModelProvider["GPT"] = "GPT";
     ModelProvider["GeminiPro"] = "GeminiPro";
+    ModelProvider["Claude"] = "Claude";
 })(ModelProvider || (ModelProvider = {}));
+const Anthropic = {
+    ChatPath: "v1/messages",
+    ChatPath1: "v1/complete",
+    ExampleEndpoint: "https://api.anthropic.com",
+    Vision: "2023-06-01"
+};
 const OpenaiPath = {
     ChatPath: "v1/chat/completions",
     UsagePath: "dashboard/billing/usage",
@@ -3464,12 +3733,20 @@ const Google = {
     VisionChatPath: "v1beta/models/gemini-pro-vision:generateContent"
 };
 const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
+// export const DEFAULT_SYSTEM_TEMPLATE = `
+// You are ChatGPT, a large language model trained by {{ServiceProvider}}.
+// Knowledge cutoff: {{cutoff}}
+// Current model: {{model}}
+// Current time: {{time}}
+// Latex inline: $x^2$
+// Latex block: $$e=mc^2$$
+// `;
 const DEFAULT_SYSTEM_TEMPLATE = `
 You are ChatGPT, a large language model trained by {{ServiceProvider}}.
 Knowledge cutoff: {{cutoff}}
 Current model: {{model}}
 Current time: {{time}}
-Latex inline: $x^2$ 
+Latex inline: \\(x^2\\) 
 Latex block: $$e=mc^2$$
 `;
 const SUMMARIZE_MODEL = "gpt-3.5-turbo";
@@ -3654,6 +3931,60 @@ const DEFAULT_MODELS = [
             id: "google",
             providerName: "Google",
             providerType: "google"
+        }
+    },
+    {
+        name: "claude-instant-1.2",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-2.0",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-2.1",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-3-opus-20240229",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-3-sonnet-20240229",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-3-haiku-20240307",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
         }
     }
 ];
@@ -3980,6 +4311,21 @@ const cn = {
                 ApiVerion: {
                     Title: "接口版本 (azure api version)",
                     SubTitle: "选择指定的部分版本"
+                }
+            },
+            Anthropic: {
+                ApiKey: {
+                    Title: "接口密钥",
+                    SubTitle: "使用自定义 Anthropic Key 绕过密码访问限制",
+                    Placeholder: "Anthropic API Key"
+                },
+                Endpoint: {
+                    Title: "接口地址",
+                    SubTitle: "样例："
+                },
+                ApiVerion: {
+                    Title: "接口版本 (claude api version)",
+                    SubTitle: "选择一个特定的 API 版本输入"
                 }
             },
             Google: {
@@ -4432,6 +4778,21 @@ const en = {
                     SubTitle: "Check your api version from azure console"
                 }
             },
+            Anthropic: {
+                ApiKey: {
+                    Title: "Anthropic API Key",
+                    SubTitle: "Use a custom Anthropic Key to bypass password access restrictions",
+                    Placeholder: "Anthropic API Key"
+                },
+                Endpoint: {
+                    Title: "Endpoint Address",
+                    SubTitle: "Example:"
+                },
+                ApiVerion: {
+                    Title: "API Version (claude api version)",
+                    SubTitle: "Select and input a specific API version"
+                }
+            },
             CustomModel: {
                 Title: "Custom Models",
                 SubTitle: "Custom model options, seperated by comma"
@@ -4880,6 +5241,21 @@ const pt = {
                     SubTitle: "Verifique sua vers\xe3o API do console Azure"
                 }
             },
+            Anthropic: {
+                ApiKey: {
+                    Title: "Chave API Anthropic",
+                    SubTitle: "Verifique sua chave API do console Anthropic",
+                    Placeholder: "Chave API Anthropic"
+                },
+                Endpoint: {
+                    Title: "Endpoint Address",
+                    SubTitle: "Exemplo: "
+                },
+                ApiVerion: {
+                    Title: "Vers\xe3o API (Vers\xe3o api claude)",
+                    SubTitle: "Verifique sua vers\xe3o API do console Anthropic"
+                }
+            },
             CustomModel: {
                 Title: "Modelos Personalizados",
                 SubTitle: "Op\xe7\xf5es de modelo personalizado, separados por v\xedrgula"
@@ -5312,6 +5688,21 @@ const tw = {
                 ApiVerion: {
                     Title: "接口版本 (azure api version)",
                     SubTitle: "選擇指定的部分版本"
+                }
+            },
+            Anthropic: {
+                ApiKey: {
+                    Title: "API 密鑰",
+                    SubTitle: "從 Anthropic AI 獲取您的 API 密鑰",
+                    Placeholder: "Anthropic API Key"
+                },
+                Endpoint: {
+                    Title: "終端地址",
+                    SubTitle: "示例："
+                },
+                ApiVerion: {
+                    Title: "API 版本 (claude api version)",
+                    SubTitle: "選擇一個特定的 API 版本输入"
                 }
             },
             Google: {
@@ -9218,6 +9609,21 @@ const sk = {
                     SubTitle: "Skontrolujte svoju verziu API v Azure konzole"
                 }
             },
+            Anthropic: {
+                ApiKey: {
+                    Title: "API kľ\xfač Anthropic",
+                    SubTitle: "Skontrolujte svoj API kľ\xfač v Anthropic konzole",
+                    Placeholder: "API kľ\xfač Anthropic"
+                },
+                Endpoint: {
+                    Title: "Adresa koncov\xe9ho bodu",
+                    SubTitle: "Pr\xedklad:"
+                },
+                ApiVerion: {
+                    Title: "Verzia API (claude verzia API)",
+                    SubTitle: "Vyberte špecifick\xfa verziu časti"
+                }
+            },
             CustomModel: {
                 Title: "Vlastn\xe9 modely",
                 SubTitle: "Možnosti vlastn\xe9ho modelu, oddelen\xe9 čiarkou"
@@ -10135,8 +10541,8 @@ var store_config = __webpack_require__(71472);
 var mask = __webpack_require__(73706);
 // EXTERNAL MODULE: ./app/constant.ts
 var constant = __webpack_require__(43684);
-// EXTERNAL MODULE: ./app/client/api.ts + 3 modules
-var client_api = __webpack_require__(10616);
+// EXTERNAL MODULE: ./app/client/api.ts + 4 modules
+var client_api = __webpack_require__(75224);
 // EXTERNAL MODULE: ./app/client/controller.ts
 var client_controller = __webpack_require__(82564);
 // EXTERNAL MODULE: ./app/utils/format.ts
@@ -10241,6 +10647,10 @@ function fillTemplateWith(input, modelConfig) {
         input: input
     };
     let output = modelConfig.template ?? constant/* DEFAULT_INPUT_TEMPLATE */.xf;
+    // remove duplicate
+    if (input.startsWith(output)) {
+        output = "";
+    }
     // must contains {{input}}
     const inputVar = "{{input}}";
     if (!output.includes(inputVar)) {
@@ -10426,6 +10836,8 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             var api;
             if (modelConfig.model.startsWith("gemini")) {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
+            } else if (modelConfig.model.startsWith("claude")) {
+                api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.Claude);
             } else {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
             }
@@ -10562,6 +10974,8 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             var api;
             if (modelConfig.model.startsWith("gemini")) {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
+            } else if (modelConfig.model.startsWith("claude")) {
+                api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.Claude);
             } else {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
             }
@@ -10875,8 +11289,8 @@ var store = __webpack_require__(35122);
 var chatgpt = __webpack_require__(24362);
 // EXTERNAL MODULE: ./app/locales/index.ts + 19 modules
 var locales = __webpack_require__(57254);
-// EXTERNAL MODULE: ./app/client/api.ts + 3 modules
-var client_api = __webpack_require__(10616);
+// EXTERNAL MODULE: ./app/client/api.ts + 4 modules
+var client_api = __webpack_require__(75224);
 ;// CONCATENATED MODULE: ./app/store/update.ts
 
 
@@ -11026,6 +11440,10 @@ const DEFAULT_ACCESS_STATE = {
     googleUrl: "",
     googleApiKey: "",
     googleApiVersion: "v1",
+    // anthropic
+    anthropicApiKey: "",
+    anthropicApiVersion: "2023-06-01",
+    anthropicUrl: "",
     // server config
     needCode: true,
     hideUserApiKey: false,
@@ -11058,10 +11476,15 @@ const useAccessStore = (0,store/* createPersistStore */.D)({
                 "googleApiKey"
             ]);
         },
+        isValidAnthropic () {
+            return (0,clone/* ensure */.z)(get(), [
+                "anthropicApiKey"
+            ]);
+        },
         isAuthorized () {
             this.fetch();
             // has token or has code or disabled access control
-            return this.isValidOpenAI() || this.isValidAzure() || this.isValidGoogle() || !this.enabledAccessControl() || this.enabledAccessControl() && (0,clone/* ensure */.z)(get(), [
+            return this.isValidOpenAI() || this.isValidAzure() || this.isValidGoogle() || this.isValidAnthropic() || !this.enabledAccessControl() || this.enabledAccessControl() && (0,clone/* ensure */.z)(get(), [
                 "accessCode"
             ]);
         },
@@ -12396,6 +12819,7 @@ const FETCH_TAG_URL = (/* unused pure expression or super */ null && (`https://a
 const RUNTIME_CONFIG_DOM = "danger-runtime-config";
 const DEFAULT_API_HOST = "https://api.nextchat.dev";
 const OPENAI_BASE_URL = "https://api.openai.com";
+const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
 var Path;
 (function(Path) {
@@ -12410,6 +12834,7 @@ var ApiPath;
 (function(ApiPath) {
     ApiPath["Cors"] = "";
     ApiPath["OpenAI"] = "/api/openai";
+    ApiPath["Anthropic"] = "/api/anthropic";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
 (function(SlotID) {
@@ -12446,12 +12871,20 @@ var ServiceProvider;
     ServiceProvider["OpenAI"] = "OpenAI";
     ServiceProvider["Azure"] = "Azure";
     ServiceProvider["Google"] = "Google";
+    ServiceProvider["Anthropic"] = "Anthropic";
 })(ServiceProvider || (ServiceProvider = {}));
 var ModelProvider;
 (function(ModelProvider) {
     ModelProvider["GPT"] = "GPT";
     ModelProvider["GeminiPro"] = "GeminiPro";
+    ModelProvider["Claude"] = "Claude";
 })(ModelProvider || (ModelProvider = {}));
+const Anthropic = {
+    ChatPath: "v1/messages",
+    ChatPath1: "v1/complete",
+    ExampleEndpoint: "https://api.anthropic.com",
+    Vision: "2023-06-01"
+};
 const OpenaiPath = {
     ChatPath: "v1/chat/completions",
     UsagePath: "dashboard/billing/usage",
@@ -12467,12 +12900,20 @@ const Google = {
     VisionChatPath: "v1beta/models/gemini-pro-vision:generateContent"
 };
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
+// export const DEFAULT_SYSTEM_TEMPLATE = `
+// You are ChatGPT, a large language model trained by {{ServiceProvider}}.
+// Knowledge cutoff: {{cutoff}}
+// Current model: {{model}}
+// Current time: {{time}}
+// Latex inline: $x^2$
+// Latex block: $$e=mc^2$$
+// `;
 const DEFAULT_SYSTEM_TEMPLATE = (/* unused pure expression or super */ null && (`
 You are ChatGPT, a large language model trained by {{ServiceProvider}}.
 Knowledge cutoff: {{cutoff}}
 Current model: {{model}}
 Current time: {{time}}
-Latex inline: $x^2$ 
+Latex inline: \\(x^2\\) 
 Latex block: $$e=mc^2$$
 `));
 const SUMMARIZE_MODEL = "gpt-3.5-turbo";
@@ -12658,6 +13099,60 @@ const DEFAULT_MODELS = [
             providerName: "Google",
             providerType: "google"
         }
+    },
+    {
+        name: "claude-instant-1.2",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-2.0",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-2.1",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-3-opus-20240229",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-3-sonnet-20240229",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
+    },
+    {
+        name: "claude-3-haiku-20240307",
+        available: true,
+        provider: {
+            id: "anthropic",
+            providerName: "Anthropic",
+            providerType: "anthropic"
+        }
     }
 ];
 const CHAT_PAGE_SIZE = 15;
@@ -12687,6 +13182,7 @@ const getServerSideConfig = ()=>{
     }
     const isAzure = !!process.env.AZURE_URL;
     const isGoogle = !!process.env.GOOGLE_API_KEY;
+    const isAnthropic = !!process.env.ANTHROPIC_API_KEY;
     const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
     const apiKeys = apiKeyEnvVar.split(",").map((v)=>v.trim());
     const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -12703,6 +13199,10 @@ const getServerSideConfig = ()=>{
         isGoogle,
         googleApiKey: process.env.GOOGLE_API_KEY,
         googleUrl: process.env.GOOGLE_URL,
+        isAnthropic,
+        anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+        anthropicApiVersion: process.env.ANTHROPIC_API_VERSION,
+        anthropicUrl: process.env.ANTHROPIC_URL,
         gtmId: process.env.GTM_ID,
         needCode: ACCESS_CODES.size > 0,
         code: process.env.CODE,

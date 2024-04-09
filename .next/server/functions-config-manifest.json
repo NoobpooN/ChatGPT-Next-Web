@@ -1,4 +1,5 @@
 {
+  "/api/anthropic/[...path]": {},
   "/api/config": {},
   "/api/google/[...path]": {},
   "/api/openai/[...path]": {},

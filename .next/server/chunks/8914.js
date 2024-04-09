@@ -155,7 +155,9 @@ function escapeBrackets(text) {
     });
 }
 function _MarkDownContent(props) {
-    const escapedContent = (0,react__WEBPACK_IMPORTED_MODULE_2__.useMemo)(()=>escapeBrackets(escapeDollarNumber(props.content)), [
+    const escapedContent = (0,react__WEBPACK_IMPORTED_MODULE_2__.useMemo)(()=>{
+        return escapeBrackets(escapeDollarNumber(props.content));
+    }, [
         props.content
     ]);
     return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(react_markdown__WEBPACK_IMPORTED_MODULE_8__/* .ReactMarkdown */ .D, {
