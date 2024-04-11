@@ -98,8 +98,8 @@ var react_router_dom_production_min = __webpack_require__(99742);
 var mask = __webpack_require__(73706);
 // EXTERNAL MODULE: ./app/locales/index.ts + 19 modules
 var locales = __webpack_require__(57254);
-// EXTERNAL MODULE: ./app/store/index.ts + 2 modules
-var store = __webpack_require__(1075);
+// EXTERNAL MODULE: ./app/store/index.ts + 1 modules
+var store = __webpack_require__(94934);
 // EXTERNAL MODULE: ./app/components/mask.tsx
 var components_mask = __webpack_require__(94417);
 // EXTERNAL MODULE: ./app/command.ts

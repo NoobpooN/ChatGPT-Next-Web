@@ -811,8 +811,8 @@ var SvgRobot = function SvgRobot(props) {
   }))));
 };
 /* harmony default export */ const robot = (SvgRobot);
-// EXTERNAL MODULE: ./app/store/index.ts + 2 modules
-var store = __webpack_require__(1075);
+// EXTERNAL MODULE: ./app/store/index.ts + 1 modules
+var store = __webpack_require__(94934);
 // EXTERNAL MODULE: ./app/utils.ts
 var utils = __webpack_require__(92842);
 // EXTERNAL MODULE: ./node_modules/next/dist/shared/lib/app-dynamic.js
@@ -1083,8 +1083,11 @@ var lib = __webpack_require__(61311);
 var client = __webpack_require__(39463);
 // EXTERNAL MODULE: ./app/client/api.ts + 4 modules
 var client_api = __webpack_require__(75224);
+// EXTERNAL MODULE: ./app/utils/checkers.ts
+var checkers = __webpack_require__(15897);
 ;// CONCATENATED MODULE: ./app/components/exporter.tsx
 /* eslint-disable @next/next/no-img-element */ 
+
 
 
 
@@ -1352,7 +1355,7 @@ function PreviewActions(props) {
         var api;
         if (config.modelConfig.model.startsWith("gemini")) {
             api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
-        } else if (config.modelConfig.model.startsWith("claude")) {
+        } else if ((0,checkers/* identifyDefaultClaudeModel */.s)(config.modelConfig.model)) {
             api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.Claude);
         } else {
             api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
@@ -1738,8 +1741,8 @@ function JsonPreviewer(props) {
     });
 }
 
-// EXTERNAL MODULE: ./app/utils/hooks.ts + 1 modules
-var hooks = __webpack_require__(75804);
+// EXTERNAL MODULE: ./app/utils/hooks.ts
+var hooks = __webpack_require__(86831);
 ;// CONCATENATED MODULE: ./app/components/chat.tsx
 
 

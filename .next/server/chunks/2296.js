@@ -217,8 +217,8 @@ var ui_lib = __webpack_require__(24552);
 var model_config = __webpack_require__(80663);
 // EXTERNAL MODULE: ./app/components/button.tsx
 var components_button = __webpack_require__(39378);
-// EXTERNAL MODULE: ./app/store/index.ts + 2 modules
-var store = __webpack_require__(1075);
+// EXTERNAL MODULE: ./app/store/index.ts + 1 modules
+var store = __webpack_require__(94934);
 // EXTERNAL MODULE: ./app/locales/index.ts + 19 modules
 var locales = __webpack_require__(57254);
 // EXTERNAL MODULE: ./app/utils.ts

@@ -449,11 +449,11 @@ function InputRange({ onChange, title, value, className, min, max, step }) {
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(56786);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1075);
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(94934);
 /* harmony import */ var _locales__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(57254);
 /* harmony import */ var _input_range__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(26033);
 /* harmony import */ var _ui_lib__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(24552);
-/* harmony import */ var _utils_hooks__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(75804);
+/* harmony import */ var _utils_hooks__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(86831);
 
 
 
@@ -607,66 +607,25 @@ function ModelConfigList(props) {
 
 /***/ }),
 
-/***/ 75804:
+/***/ 86831:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  l: () => (/* binding */ useAllModels)
-});
-
-// EXTERNAL MODULE: external "next/dist/compiled/react"
-var react_ = __webpack_require__(18038);
-// EXTERNAL MODULE: ./app/store/index.ts + 2 modules
-var store = __webpack_require__(1075);
-;// CONCATENATED MODULE: ./app/utils/model.ts
-function collectModelTable(models, customModels) {
-    const modelTable = {};
-    // default models
-    models.forEach((m)=>{
-        modelTable[m.name] = {
-            ...m,
-            displayName: m.name
-        };
-    });
-    // server custom models
-    customModels.split(",").filter((v)=>!!v && v.length > 0).forEach((m)=>{
-        const available = !m.startsWith("-");
-        const nameConfig = m.startsWith("+") || m.startsWith("-") ? m.slice(1) : m;
-        const [name, displayName] = nameConfig.split("=");
-        // enable or disable all models
-        if (name === "all") {
-            Object.values(modelTable).forEach((model)=>model.available = available);
-        } else {
-            modelTable[name] = {
-                name,
-                displayName: displayName || name,
-                available,
-                provider: modelTable[name]?.provider
-            };
-        }
-    });
-    return modelTable;
-}
-/**
- * Generate full model table.
- */ function collectModels(models, customModels) {
-    const modelTable = collectModelTable(models, customModels);
-    const allModels = Object.values(modelTable);
-    return allModels;
-}
-
-;// CONCATENATED MODULE: ./app/utils/hooks.ts
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   l: () => (/* binding */ useAllModels)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(18038);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(94934);
+/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(24914);
 
 
 
 function useAllModels() {
-    const accessStore = (0,store/* useAccessStore */._X)();
-    const configStore = (0,store/* useAppConfig */.MG)();
-    const models = (0,react_.useMemo)(()=>{
-        return collectModels(configStore.models, [
+    const accessStore = (0,_store__WEBPACK_IMPORTED_MODULE_1__/* .useAccessStore */ ._X)();
+    const configStore = (0,_store__WEBPACK_IMPORTED_MODULE_1__/* .useAppConfig */ .MG)();
+    const models = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(()=>{
+        return (0,_model__WEBPACK_IMPORTED_MODULE_2__/* .collectModels */ .H)(configStore.models, [
             configStore.customModels,
             accessStore.customModels
         ].join(","));

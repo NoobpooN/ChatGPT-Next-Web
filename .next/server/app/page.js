@@ -1199,15 +1199,15 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ 75345:
+/***/ 57368:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 19476));
-Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 45900))
+Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 45900));
+Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 19476))
 
 /***/ }),
 
-/***/ 42391:
+/***/ 51196:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
 Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494));
@@ -1218,14 +1218,14 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_
 
 /***/ }),
 
-/***/ 67510:
+/***/ 19660:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 47734, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 88709, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 62698, 23));
 Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 7833, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 29150, 23));
-Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 47734, 23))
+Promise.resolve(/* import() eager */).then(__webpack_require__.t.bind(__webpack_require__, 29150, 23))
 
 /***/ }),
 
@@ -1247,8 +1247,8 @@ __webpack_require__.d(__webpack_exports__, {
 var client = __webpack_require__(39463);
 // EXTERNAL MODULE: ./app/constant.ts
 var constant = __webpack_require__(43684);
-// EXTERNAL MODULE: ./app/store/index.ts + 2 modules
-var store = __webpack_require__(1075);
+// EXTERNAL MODULE: ./app/store/index.ts + 1 modules
+var store = __webpack_require__(94934);
 // EXTERNAL MODULE: ./app/locales/index.ts + 19 modules
 var locales = __webpack_require__(57254);
 // EXTERNAL MODULE: ./node_modules/@fortaine/fetch-event-source/lib/esm/fetch.js + 1 modules
@@ -2439,8 +2439,8 @@ var SvgPlugin = function SvgPlugin(props) {
 /* harmony default export */ const icons_plugin = (SvgPlugin);
 // EXTERNAL MODULE: ./app/icons/drag.svg
 var drag = __webpack_require__(3276);
-// EXTERNAL MODULE: ./app/store/index.ts + 2 modules
-var store = __webpack_require__(1075);
+// EXTERNAL MODULE: ./app/store/index.ts + 1 modules
+var store = __webpack_require__(94934);
 // EXTERNAL MODULE: ./app/components/ui-lib.tsx + 3 modules
 var ui_lib = __webpack_require__(24552);
 ;// CONCATENATED MODULE: ./app/components/sidebar.tsx
@@ -2807,9 +2807,12 @@ function AuthPage() {
 
 // EXTERNAL MODULE: ./app/client/api.ts + 4 modules
 var client_api = __webpack_require__(75224);
+// EXTERNAL MODULE: ./app/utils/checkers.ts
+var checkers = __webpack_require__(15897);
 ;// CONCATENATED MODULE: ./app/components/home.tsx
 /* __next_internal_client_entry_do_not_use__ Loading,useSwitchTheme,useLoadData,Home auto */ 
 __webpack_require__(81757);
+
 
 
 
@@ -2980,7 +2983,7 @@ function useLoadData() {
     var api;
     if (config.modelConfig.model.startsWith("gemini")) {
         api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
-    } else if (config.modelConfig.model.startsWith("claude")) {
+    } else if ((0,checkers/* identifyDefaultClaudeModel */.s)(config.modelConfig.model)) {
         api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.Claude);
     } else {
         api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
@@ -3640,7 +3643,7 @@ function queryMeta(key, defaultValue) {
 /* harmony export */   ym: () => (/* binding */ SlotID),
 /* harmony export */   yp: () => (/* binding */ DEFAULT_SYSTEM_TEMPLATE)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, RUNTIME_CONFIG_DOM, ANTHROPIC_BASE_URL, GEMINI_BASE_URL, MAX_RENDER_MSG_COUNT */
+/* unused harmony exports OWNER, REPO, RUNTIME_CONFIG_DOM, ANTHROPIC_BASE_URL, GEMINI_BASE_URL, MAX_RENDER_MSG_COUNT, internalWhiteWebDavEndpoints */
 const OWNER = "Yidadaa";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
@@ -3753,6 +3756,7 @@ const SUMMARIZE_MODEL = "gpt-3.5-turbo";
 const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
 const KnowledgeCutOffDate = {
     default: "2021-09",
+    "gpt-4-turbo": "2023-12",
     "gpt-4-turbo-preview": "2023-12",
     "gpt-4-1106-preview": "2023-04",
     "gpt-4-0125-preview": "2023-12",
@@ -3809,6 +3813,24 @@ const DEFAULT_MODELS = [
     },
     {
         name: "gpt-4-32k-0613",
+        available: true,
+        provider: {
+            id: "openai",
+            providerName: "OpenAI",
+            providerType: "openai"
+        }
+    },
+    {
+        name: "gpt-4-turbo",
+        available: true,
+        provider: {
+            id: "openai",
+            providerName: "OpenAI",
+            providerType: "openai"
+        }
+    },
+    {
+        name: "gpt-4-turbo-2024-04-09",
         available: true,
         provider: {
             id: "openai",
@@ -3990,6 +4012,17 @@ const DEFAULT_MODELS = [
 ];
 const CHAT_PAGE_SIZE = 15;
 const MAX_RENDER_MSG_COUNT = 45;
+// some famous webdav endpoints
+const internalWhiteWebDavEndpoints = (/* unused pure expression or super */ null && ([
+    "https://dav.jianguoyun.com/dav/",
+    "https://dav.dropdav.com/",
+    "https://dav.box.com/dav",
+    "https://nanao.teracloud.jp/dav/",
+    "https://webdav.4shared.com/",
+    "https://dav.idrivesync.com",
+    "https://webdav.yandex.com",
+    "https://app.koofr.net/dav/Koofr"
+]));
 
 
 /***/ }),
@@ -10516,6 +10549,124 @@ if (!Array.prototype.at) {
 
 /***/ }),
 
+/***/ 15504:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   _: () => (/* binding */ useAccessStore)
+/* harmony export */ });
+/* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(43684);
+/* harmony import */ var _client_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(75224);
+/* harmony import */ var _config_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(39463);
+/* harmony import */ var _utils_store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(35122);
+/* harmony import */ var _utils_clone__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(25157);
+
+
+
+
+
+let fetchState = 0; // 0 not fetch, 1 fetching, 2 done
+const DEFAULT_OPENAI_URL = (0,_config_client__WEBPACK_IMPORTED_MODULE_2__/* .getClientConfig */ .Z)()?.buildMode === "export" ? _constant__WEBPACK_IMPORTED_MODULE_0__/* .DEFAULT_API_HOST */ .Ky + "/api/proxy/openai" : _constant__WEBPACK_IMPORTED_MODULE_0__/* .ApiPath */ .L.OpenAI;
+const DEFAULT_ACCESS_STATE = {
+    accessCode: "",
+    useCustomConfig: false,
+    provider: _constant__WEBPACK_IMPORTED_MODULE_0__/* .ServiceProvider */ .UT.OpenAI,
+    // openai
+    openaiUrl: DEFAULT_OPENAI_URL,
+    openaiApiKey: "",
+    // azure
+    azureUrl: "",
+    azureApiKey: "",
+    azureApiVersion: "2023-08-01-preview",
+    // google ai studio
+    googleUrl: "",
+    googleApiKey: "",
+    googleApiVersion: "v1",
+    // anthropic
+    anthropicApiKey: "",
+    anthropicApiVersion: "2023-06-01",
+    anthropicUrl: "",
+    // server config
+    needCode: true,
+    hideUserApiKey: false,
+    hideBalanceQuery: false,
+    disableGPT4: false,
+    disableFastLink: false,
+    customModels: ""
+};
+const useAccessStore = (0,_utils_store__WEBPACK_IMPORTED_MODULE_3__/* .createPersistStore */ .D)({
+    ...DEFAULT_ACCESS_STATE
+}, (set, get)=>({
+        enabledAccessControl () {
+            this.fetch();
+            return get().needCode;
+        },
+        isValidOpenAI () {
+            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+                "openaiApiKey"
+            ]);
+        },
+        isValidAzure () {
+            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+                "azureUrl",
+                "azureApiKey",
+                "azureApiVersion"
+            ]);
+        },
+        isValidGoogle () {
+            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+                "googleApiKey"
+            ]);
+        },
+        isValidAnthropic () {
+            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+                "anthropicApiKey"
+            ]);
+        },
+        isAuthorized () {
+            this.fetch();
+            // has token or has code or disabled access control
+            return this.isValidOpenAI() || this.isValidAzure() || this.isValidGoogle() || this.isValidAnthropic() || !this.enabledAccessControl() || this.enabledAccessControl() && (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+                "accessCode"
+            ]);
+        },
+        fetch () {
+            if (fetchState > 0 || (0,_config_client__WEBPACK_IMPORTED_MODULE_2__/* .getClientConfig */ .Z)()?.buildMode === "export") return;
+            fetchState = 1;
+            fetch("/api/config", {
+                method: "post",
+                body: null,
+                headers: {
+                    ...(0,_client_api__WEBPACK_IMPORTED_MODULE_1__/* .getHeaders */ .wU)()
+                }
+            }).then((res)=>res.json()).then((res)=>{
+                console.log("[Config] got config from server", res);
+                set(()=>({
+                        ...res
+                    }));
+            }).catch(()=>{
+                console.error("[Config] failed to fetch config");
+            }).finally(()=>{
+                fetchState = 2;
+            });
+        }
+    }), {
+    name: _constant__WEBPACK_IMPORTED_MODULE_0__/* .StoreKey */ .KJ.Access,
+    version: 2,
+    migrate (persistedState, version) {
+        if (version < 2) {
+            const state = persistedState;
+            state.openaiApiKey = state.token;
+            state.azureApiVersion = "2023-08-01-preview";
+        }
+        return persistedState;
+    }
+});
+
+
+/***/ }),
+
 /***/ 16085:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -10572,7 +10723,10 @@ function estimateTokenLength(input) {
 var nanoid = __webpack_require__(35667);
 // EXTERNAL MODULE: ./app/utils/store.ts
 var store = __webpack_require__(35122);
+// EXTERNAL MODULE: ./app/utils/checkers.ts
+var checkers = __webpack_require__(15897);
 ;// CONCATENATED MODULE: ./app/store/chat.ts
+
 
 
 
@@ -10836,7 +10990,7 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             var api;
             if (modelConfig.model.startsWith("gemini")) {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
-            } else if (modelConfig.model.startsWith("claude")) {
+            } else if ((0,checkers/* identifyDefaultClaudeModel */.s)(modelConfig.model)) {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.Claude);
             } else {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
@@ -10974,7 +11128,7 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
             var api;
             if (modelConfig.model.startsWith("gemini")) {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GeminiPro);
-            } else if (modelConfig.model.startsWith("claude")) {
+            } else if ((0,checkers/* identifyDefaultClaudeModel */.s)(modelConfig.model)) {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.Claude);
             } else {
                 api = new client_api/* ClientApi */.ti(constant/* ModelProvider */.k8.GPT);
@@ -11256,7 +11410,7 @@ const useAppConfig = (0,_utils_store__WEBPACK_IMPORTED_MODULE_2__/* .createPersi
 
 /***/ }),
 
-/***/ 1075:
+/***/ 94934:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -11269,7 +11423,7 @@ __webpack_require__.d(__webpack_exports__, {
   mQ: () => (/* reexport */ config/* SubmitKey */.mQ),
   Q2: () => (/* reexport */ config/* Theme */.Q2),
   tn: () => (/* reexport */ chat/* createMessage */.tn),
-  _X: () => (/* reexport */ useAccessStore),
+  _X: () => (/* reexport */ access/* useAccessStore */._),
   MG: () => (/* reexport */ config/* useAppConfig */.MG),
   aK: () => (/* reexport */ chat/* useChatStore */.aK),
   u2: () => (/* reexport */ useUpdateStore)
@@ -11415,112 +11569,8 @@ const useUpdateStore = (0,store/* createPersistStore */.D)({
     version: 1
 });
 
-// EXTERNAL MODULE: ./app/utils/clone.ts
-var clone = __webpack_require__(25157);
-;// CONCATENATED MODULE: ./app/store/access.ts
-
-
-
-
-
-let fetchState = 0; // 0 not fetch, 1 fetching, 2 done
-const DEFAULT_OPENAI_URL = (0,client/* getClientConfig */.Z)()?.buildMode === "export" ? constant/* DEFAULT_API_HOST */.Ky + "/api/proxy/openai" : constant/* ApiPath */.L.OpenAI;
-const DEFAULT_ACCESS_STATE = {
-    accessCode: "",
-    useCustomConfig: false,
-    provider: constant/* ServiceProvider */.UT.OpenAI,
-    // openai
-    openaiUrl: DEFAULT_OPENAI_URL,
-    openaiApiKey: "",
-    // azure
-    azureUrl: "",
-    azureApiKey: "",
-    azureApiVersion: "2023-08-01-preview",
-    // google ai studio
-    googleUrl: "",
-    googleApiKey: "",
-    googleApiVersion: "v1",
-    // anthropic
-    anthropicApiKey: "",
-    anthropicApiVersion: "2023-06-01",
-    anthropicUrl: "",
-    // server config
-    needCode: true,
-    hideUserApiKey: false,
-    hideBalanceQuery: false,
-    disableGPT4: false,
-    disableFastLink: false,
-    customModels: ""
-};
-const useAccessStore = (0,store/* createPersistStore */.D)({
-    ...DEFAULT_ACCESS_STATE
-}, (set, get)=>({
-        enabledAccessControl () {
-            this.fetch();
-            return get().needCode;
-        },
-        isValidOpenAI () {
-            return (0,clone/* ensure */.z)(get(), [
-                "openaiApiKey"
-            ]);
-        },
-        isValidAzure () {
-            return (0,clone/* ensure */.z)(get(), [
-                "azureUrl",
-                "azureApiKey",
-                "azureApiVersion"
-            ]);
-        },
-        isValidGoogle () {
-            return (0,clone/* ensure */.z)(get(), [
-                "googleApiKey"
-            ]);
-        },
-        isValidAnthropic () {
-            return (0,clone/* ensure */.z)(get(), [
-                "anthropicApiKey"
-            ]);
-        },
-        isAuthorized () {
-            this.fetch();
-            // has token or has code or disabled access control
-            return this.isValidOpenAI() || this.isValidAzure() || this.isValidGoogle() || this.isValidAnthropic() || !this.enabledAccessControl() || this.enabledAccessControl() && (0,clone/* ensure */.z)(get(), [
-                "accessCode"
-            ]);
-        },
-        fetch () {
-            if (fetchState > 0 || (0,client/* getClientConfig */.Z)()?.buildMode === "export") return;
-            fetchState = 1;
-            fetch("/api/config", {
-                method: "post",
-                body: null,
-                headers: {
-                    ...(0,client_api/* getHeaders */.wU)()
-                }
-            }).then((res)=>res.json()).then((res)=>{
-                console.log("[Config] got config from server", res);
-                set(()=>({
-                        ...res
-                    }));
-            }).catch(()=>{
-                console.error("[Config] failed to fetch config");
-            }).finally(()=>{
-                fetchState = 2;
-            });
-        }
-    }), {
-    name: constant/* StoreKey */.KJ.Access,
-    version: 2,
-    migrate (persistedState, version) {
-        if (version < 2) {
-            const state = persistedState;
-            state.openaiApiKey = state.token;
-            state.azureApiVersion = "2023-08-01-preview";
-        }
-        return persistedState;
-    }
-});
-
+// EXTERNAL MODULE: ./app/store/access.ts
+var access = __webpack_require__(15504);
 // EXTERNAL MODULE: ./app/store/config.ts
 var config = __webpack_require__(71472);
 ;// CONCATENATED MODULE: ./app/store/index.ts
@@ -11832,8 +11882,8 @@ var client = __webpack_require__(39463);
 var constant = __webpack_require__(43684);
 // EXTERNAL MODULE: ./app/utils/store.ts
 var store = __webpack_require__(35122);
-// EXTERNAL MODULE: ./app/store/index.ts + 2 modules
-var app_store = __webpack_require__(1075);
+// EXTERNAL MODULE: ./app/store/index.ts + 1 modules
+var app_store = __webpack_require__(94934);
 // EXTERNAL MODULE: ./app/store/mask.ts
 var mask = __webpack_require__(73706);
 // EXTERNAL MODULE: ./app/store/prompt.ts
@@ -12342,12 +12392,39 @@ function getMessageImages(message) {
     return urls;
 }
 function isVisionModel(model) {
-    // Note: This is a better way using the TypeScript feature instead of `&&` or `||` (ts v5.5.0-dev.20240314 I've been using)
     const visionKeywords = [
         "vision",
         "claude-3"
     ];
-    return visionKeywords.some((keyword)=>model.includes(keyword));
+    const isGpt4Turbo = model.includes("gpt-4-turbo") && !model.includes("preview");
+    return visionKeywords.some((keyword)=>model.includes(keyword)) || isGpt4Turbo;
+}
+
+
+/***/ }),
+
+/***/ 15897:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   s: () => (/* binding */ identifyDefaultClaudeModel)
+/* harmony export */ });
+/* harmony import */ var _store_access__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(15504);
+/* harmony import */ var _store_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(71472);
+/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(24914);
+
+
+
+function identifyDefaultClaudeModel(modelName) {
+    const accessStore = _store_access__WEBPACK_IMPORTED_MODULE_0__/* .useAccessStore */ ._.getState();
+    const configStore = _store_config__WEBPACK_IMPORTED_MODULE_1__/* .useAppConfig */ .MG.getState();
+    const allModals = (0,_model__WEBPACK_IMPORTED_MODULE_2__/* .collectModels */ .H)(configStore.models, [
+        configStore.customModels,
+        accessStore.customModels
+    ].join(","));
+    const modelMeta = allModals.find((m)=>m.name === modelName);
+    return modelName.startsWith("claude") && modelMeta && modelMeta.provider?.providerType === "anthropic";
 }
 
 
@@ -12631,6 +12708,58 @@ function merge(target, source) {
         }
         target[key] = source[key];
     });
+}
+
+
+/***/ }),
+
+/***/ 24914:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   H: () => (/* binding */ collectModels)
+/* harmony export */ });
+/* unused harmony export collectModelTable */
+function collectModelTable(models, customModels) {
+    const modelTable = {};
+    // default models
+    models.forEach((m)=>{
+        modelTable[m.name] = {
+            ...m,
+            displayName: m.name
+        };
+    });
+    const customProvider = (modelName)=>({
+            id: modelName,
+            providerName: "",
+            providerType: "custom"
+        });
+    // server custom models
+    customModels.split(",").filter((v)=>!!v && v.length > 0).forEach((m)=>{
+        const available = !m.startsWith("-");
+        const nameConfig = m.startsWith("+") || m.startsWith("-") ? m.slice(1) : m;
+        const [name, displayName] = nameConfig.split("=");
+        // enable or disable all models
+        if (name === "all") {
+            Object.values(modelTable).forEach((model)=>model.available = available);
+        } else {
+            modelTable[name] = {
+                name,
+                displayName: displayName || name,
+                available,
+                provider: modelTable[name]?.provider ?? customProvider(name)
+            };
+        }
+    });
+    return modelTable;
+}
+/**
+ * Generate full model table.
+ */ function collectModels(models, customModels) {
+    const modelTable = collectModelTable(models, customModels);
+    const allModels = Object.values(modelTable);
+    return allModels;
 }
 
 
@@ -12920,6 +13049,7 @@ const SUMMARIZE_MODEL = "gpt-3.5-turbo";
 const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
 const KnowledgeCutOffDate = {
     default: "2021-09",
+    "gpt-4-turbo": "2023-12",
     "gpt-4-turbo-preview": "2023-12",
     "gpt-4-1106-preview": "2023-04",
     "gpt-4-0125-preview": "2023-12",
@@ -12976,6 +13106,24 @@ const DEFAULT_MODELS = [
     },
     {
         name: "gpt-4-32k-0613",
+        available: true,
+        provider: {
+            id: "openai",
+            providerName: "OpenAI",
+            providerType: "openai"
+        }
+    },
+    {
+        name: "gpt-4-turbo",
+        available: true,
+        provider: {
+            id: "openai",
+            providerName: "OpenAI",
+            providerType: "openai"
+        }
+    },
+    {
+        name: "gpt-4-turbo-2024-04-09",
         available: true,
         provider: {
             id: "openai",
@@ -13157,6 +13305,17 @@ const DEFAULT_MODELS = [
 ];
 const CHAT_PAGE_SIZE = 15;
 const MAX_RENDER_MSG_COUNT = 45;
+// some famous webdav endpoints
+const internalWhiteWebDavEndpoints = (/* unused pure expression or super */ null && ([
+    "https://dav.jianguoyun.com/dav/",
+    "https://dav.dropdav.com/",
+    "https://dav.box.com/dav",
+    "https://nanao.teracloud.jp/dav/",
+    "https://webdav.4shared.com/",
+    "https://dav.idrivesync.com",
+    "https://webdav.yandex.com",
+    "https://app.koofr.net/dav/Koofr"
+]));
 
 ;// CONCATENATED MODULE: ./app/config/server.ts
 
@@ -13188,6 +13347,7 @@ const getServerSideConfig = ()=>{
     const randomIndex = Math.floor(Math.random() * apiKeys.length);
     const apiKey = apiKeys[randomIndex];
     console.log(`[Server Config] using ${randomIndex + 1} of ${apiKeys.length} api key`);
+    const whiteWebDevEndpoints = (process.env.WHITE_WEBDEV_ENDPOINTS ?? "").split(",");
     return {
         baseUrl: process.env.BASE_URL,
         apiKey,
@@ -13213,7 +13373,8 @@ const getServerSideConfig = ()=>{
         disableGPT4,
         hideBalanceQuery: !process.env.ENABLE_BALANCE_QUERY,
         disableFastLink: !!process.env.DISABLE_FAST_LINK,
-        customModels
+        customModels,
+        whiteWebDevEndpoints
     };
 };
 
@@ -13348,6 +13509,10 @@ function RootLayout({ children }) {
                     /*#__PURE__*/ jsx_runtime_.jsx("meta", {
                         name: "config",
                         content: JSON.stringify(getClientConfig())
+                    }),
+                    /*#__PURE__*/ jsx_runtime_.jsx("meta", {
+                        name: "viewport",
+                        content: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
                     }),
                     /*#__PURE__*/ jsx_runtime_.jsx("link", {
                         rel: "manifest",

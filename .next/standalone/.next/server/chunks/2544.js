@@ -17,7 +17,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _home_module_scss__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(83465);
 /* harmony import */ var _home_module_scss__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_home_module_scss__WEBPACK_IMPORTED_MODULE_11__);
 /* harmony import */ var _hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(41423);
-/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1075);
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(94934);
 /* harmony import */ var _locales__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(57254);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(99742);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(react_router_dom__WEBPACK_IMPORTED_MODULE_9__);
