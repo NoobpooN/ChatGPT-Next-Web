@@ -43,7 +43,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(92842);
 /* harmony import */ var _model_config__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(80663);
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(43684);
-/* harmony import */ var _masks__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(8586);
+/* harmony import */ var _masks__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(79026);
 /* harmony import */ var _hello_pangea_dnd__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(41423);
 
 
@@ -376,7 +376,7 @@ function MaskPage() {
     const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_25__.useNavigate)();
     const maskStore = (0,_store_mask__WEBPACK_IMPORTED_MODULE_12__/* .useMaskStore */ .Zy)();
     const chatStore = (0,_store__WEBPACK_IMPORTED_MODULE_13__/* .useChatStore */ .aK)();
-    const [filterLang, setFilterLang] = (0,react__WEBPACK_IMPORTED_MODULE_18__.useState)(localStorage.getItem("Mask-language"));
+    const [filterLang, setFilterLang] = (0,react__WEBPACK_IMPORTED_MODULE_18__.useState)(()=>localStorage.getItem("Mask-language"));
     (0,react__WEBPACK_IMPORTED_MODULE_18__.useEffect)(()=>{
         if (filterLang) {
             localStorage.setItem("Mask-language", filterLang);

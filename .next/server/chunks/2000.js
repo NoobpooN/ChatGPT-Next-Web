@@ -106,8 +106,8 @@ var components_mask = __webpack_require__(94417);
 var command = __webpack_require__(88286);
 // EXTERNAL MODULE: ./app/components/ui-lib.tsx + 3 modules
 var ui_lib = __webpack_require__(24552);
-// EXTERNAL MODULE: ./app/masks/index.ts + 2 modules
-var app_masks = __webpack_require__(8586);
+// EXTERNAL MODULE: ./app/masks/index.ts + 3 modules
+var app_masks = __webpack_require__(79026);
 ;// CONCATENATED MODULE: ./app/components/new-chat.tsx
 
 
