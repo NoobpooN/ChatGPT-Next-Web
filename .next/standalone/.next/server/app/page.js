@@ -1279,11 +1279,17 @@ var utils = __webpack_require__(92842);
 class ChatGPTApi {
     path(path) {
         const accessStore = store/* useAccessStore */._X.getState();
-        const isAzure = accessStore.provider === constant/* ServiceProvider */.UT.Azure;
-        if (isAzure && !accessStore.isValidAzure()) {
-            throw Error("incomplete azure config, please check it in your settings page");
+        let baseUrl = "";
+        if (accessStore.useCustomConfig) {
+            const isAzure = accessStore.provider === constant/* ServiceProvider */.UT.Azure;
+            if (isAzure && !accessStore.isValidAzure()) {
+                throw Error("incomplete azure config, please check it in your settings page");
+            }
+            if (isAzure) {
+                path = makeAzurePath(path, accessStore.azureApiVersion);
+            }
+            baseUrl = isAzure ? accessStore.azureUrl : accessStore.openaiUrl;
         }
-        let baseUrl = isAzure ? accessStore.azureUrl : accessStore.openaiUrl;
         if (baseUrl.length === 0) {
             const isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
             baseUrl = isApp ? constant/* DEFAULT_API_HOST */.Ky + "/proxy" + constant/* ApiPath */.L.OpenAI : constant/* ApiPath */.L.OpenAI;
@@ -1293,9 +1299,6 @@ class ChatGPTApi {
         }
         if (!baseUrl.startsWith("http") && !baseUrl.startsWith(constant/* ApiPath */.L.OpenAI)) {
             baseUrl = "https://" + baseUrl;
-        }
-        if (isAzure) {
-            path = makeAzurePath(path, accessStore.azureApiVersion);
         }
         console.log("[Proxy Endpoint] ", baseUrl, path);
         return [
@@ -1616,7 +1619,10 @@ class GeminiProApi {
             ]
         };
         const accessStore = store/* useAccessStore */._X.getState();
-        let baseUrl = accessStore.googleUrl;
+        let baseUrl = "";
+        if (accessStore.useCustomConfig) {
+            baseUrl = accessStore.googleUrl;
+        }
         const isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
         let shouldStream = !!options.config.stream;
         const controller = new AbortController();
@@ -1963,7 +1969,10 @@ class ClaudeApi {
     }
     path(path) {
         const accessStore = store/* useAccessStore */._X.getState();
-        let baseUrl = accessStore.anthropicUrl;
+        let baseUrl = "";
+        if (accessStore.useCustomConfig) {
+            baseUrl = accessStore.anthropicUrl;
+        }
         // if endpoint is empty, use default endpoint
         if (baseUrl.trim().length === 0) {
             const isApp = !!(0,client/* getClientConfig */.Z)()?.isApp;
@@ -3767,259 +3776,68 @@ const KnowledgeCutOffDate = {
     "gemini-pro": "2023-12",
     "gemini-pro-vision": "2023-12"
 };
+const openaiModels = [
+    "gpt-3.5-turbo",
+    "gpt-3.5-turbo-0301",
+    "gpt-3.5-turbo-0613",
+    "gpt-3.5-turbo-1106",
+    "gpt-3.5-turbo-0125",
+    "gpt-3.5-turbo-16k",
+    "gpt-3.5-turbo-16k-0613",
+    "gpt-4",
+    "gpt-4-0314",
+    "gpt-4-0613",
+    "gpt-4-1106-preview",
+    "gpt-4-0125-preview",
+    "gpt-4-32k",
+    "gpt-4-32k-0314",
+    "gpt-4-32k-0613",
+    "gpt-4-turbo",
+    "gpt-4-turbo-preview",
+    "gpt-4-vision-preview",
+    "gpt-4-turbo-2024-04-09"
+];
+const googleModels = [
+    "gemini-1.0-pro",
+    "gemini-1.5-pro-latest",
+    "gemini-pro-vision"
+];
+const anthropicModels = [
+    "claude-instant-1.2",
+    "claude-2.0",
+    "claude-2.1",
+    "claude-3-sonnet-20240229",
+    "claude-3-opus-20240229",
+    "claude-3-haiku-20240307"
+];
 const DEFAULT_MODELS = [
-    {
-        name: "gpt-4",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-0314",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-0613",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-32k",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-32k-0314",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-32k-0613",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-turbo",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-turbo-2024-04-09",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-turbo-preview",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-1106-preview",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-0125-preview",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-vision-preview",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-0125",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-0301",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-0613",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-1106",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-16k",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-16k-0613",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gemini-1.0-pro",
-        available: true,
-        provider: {
-            id: "google",
-            providerName: "Google",
-            providerType: "google"
-        }
-    },
-    {
-        name: "gemini-1.5-pro-latest",
-        available: true,
-        provider: {
-            id: "google",
-            providerName: "Google",
-            providerType: "google"
-        }
-    },
-    {
-        name: "gemini-pro-vision",
-        available: true,
-        provider: {
-            id: "google",
-            providerName: "Google",
-            providerType: "google"
-        }
-    },
-    {
-        name: "claude-instant-1.2",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-2.0",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-2.1",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-3-opus-20240229",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-3-sonnet-20240229",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-3-haiku-20240307",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    }
+    ...openaiModels.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "openai",
+                providerName: "OpenAI",
+                providerType: "openai"
+            }
+        })),
+    ...googleModels.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "google",
+                providerName: "Google",
+                providerType: "google"
+            }
+        })),
+    ...anthropicModels.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "anthropic",
+                providerName: "Anthropic",
+                providerType: "anthropic"
+            }
+        }))
 ];
 const CHAT_PAGE_SIZE = 15;
 const MAX_RENDER_MSG_COUNT = 45;
@@ -12959,23 +12777,21 @@ function createWebDavClient(store) {
             };
         },
         path (path, proxyUrl = "") {
-            // if (!path.endsWith("/")) {
-            //   path += "/";
-            // }
             if (path.startsWith("/")) {
                 path = path.slice(1);
             }
-            if (proxyUrl.length > 0 && !proxyUrl.endsWith("/")) {
-                proxyUrl += "/";
+            if (proxyUrl.endsWith("/")) {
+                proxyUrl = proxyUrl.slice(0, -1);
             }
             let url;
-            if (proxyUrl.length > 0 || proxyUrl === "/") {
-                let u = new URL(proxyUrl + "api/webdav/" + path);
+            const pathPrefix = "/api/webdav/";
+            try {
+                let u = new URL(proxyUrl + pathPrefix + path);
                 // add query params
                 u.searchParams.append("endpoint", config.endpoint);
                 url = u.toString();
-            } else {
-                url = "/api/upstash/" + path + "?endpoint=" + config.endpoint;
+            } catch (e) {
+                url = pathPrefix + path + "?endpoint=" + config.endpoint;
             }
             return url;
         }
@@ -13502,259 +13318,68 @@ const KnowledgeCutOffDate = {
     "gemini-pro": "2023-12",
     "gemini-pro-vision": "2023-12"
 };
+const openaiModels = [
+    "gpt-3.5-turbo",
+    "gpt-3.5-turbo-0301",
+    "gpt-3.5-turbo-0613",
+    "gpt-3.5-turbo-1106",
+    "gpt-3.5-turbo-0125",
+    "gpt-3.5-turbo-16k",
+    "gpt-3.5-turbo-16k-0613",
+    "gpt-4",
+    "gpt-4-0314",
+    "gpt-4-0613",
+    "gpt-4-1106-preview",
+    "gpt-4-0125-preview",
+    "gpt-4-32k",
+    "gpt-4-32k-0314",
+    "gpt-4-32k-0613",
+    "gpt-4-turbo",
+    "gpt-4-turbo-preview",
+    "gpt-4-vision-preview",
+    "gpt-4-turbo-2024-04-09"
+];
+const googleModels = [
+    "gemini-1.0-pro",
+    "gemini-1.5-pro-latest",
+    "gemini-pro-vision"
+];
+const anthropicModels = [
+    "claude-instant-1.2",
+    "claude-2.0",
+    "claude-2.1",
+    "claude-3-sonnet-20240229",
+    "claude-3-opus-20240229",
+    "claude-3-haiku-20240307"
+];
 const DEFAULT_MODELS = [
-    {
-        name: "gpt-4",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-0314",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-0613",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-32k",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-32k-0314",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-32k-0613",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-turbo",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-turbo-2024-04-09",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-turbo-preview",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-1106-preview",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-0125-preview",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-4-vision-preview",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-0125",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-0301",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-0613",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-1106",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-16k",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gpt-3.5-turbo-16k-0613",
-        available: true,
-        provider: {
-            id: "openai",
-            providerName: "OpenAI",
-            providerType: "openai"
-        }
-    },
-    {
-        name: "gemini-1.0-pro",
-        available: true,
-        provider: {
-            id: "google",
-            providerName: "Google",
-            providerType: "google"
-        }
-    },
-    {
-        name: "gemini-1.5-pro-latest",
-        available: true,
-        provider: {
-            id: "google",
-            providerName: "Google",
-            providerType: "google"
-        }
-    },
-    {
-        name: "gemini-pro-vision",
-        available: true,
-        provider: {
-            id: "google",
-            providerName: "Google",
-            providerType: "google"
-        }
-    },
-    {
-        name: "claude-instant-1.2",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-2.0",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-2.1",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-3-opus-20240229",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-3-sonnet-20240229",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    },
-    {
-        name: "claude-3-haiku-20240307",
-        available: true,
-        provider: {
-            id: "anthropic",
-            providerName: "Anthropic",
-            providerType: "anthropic"
-        }
-    }
+    ...openaiModels.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "openai",
+                providerName: "OpenAI",
+                providerType: "openai"
+            }
+        })),
+    ...googleModels.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "google",
+                providerName: "Google",
+                providerType: "google"
+            }
+        })),
+    ...anthropicModels.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "anthropic",
+                providerName: "Anthropic",
+                providerType: "anthropic"
+            }
+        }))
 ];
 const CHAT_PAGE_SIZE = 15;
 const MAX_RENDER_MSG_COUNT = 45;

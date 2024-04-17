@@ -1,8 +1,8 @@
 {
-  "/api/anthropic/[...path]": {},
   "/api/config": {},
-  "/api/google/[...path]": {},
-  "/api/openai/[...path]": {},
   "/api/upstash/[action]/[...key]": {},
+  "/api/openai/[...path]": {},
+  "/api/google/[...path]": {},
+  "/api/anthropic/[...path]": {},
   "/api/webdav/[...path]": {}
 }
