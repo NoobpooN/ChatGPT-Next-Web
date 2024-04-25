@@ -2079,7 +2079,19 @@ function ChatActions(props) {
     // switch model
     const currentModel = chatStore.currentSession().mask.modelConfig.model;
     const allModels = (0,hooks/* useAllModels */.l)();
-    const models = (0,react_.useMemo)(()=>allModels.filter((m)=>m.available), [
+    const models = (0,react_.useMemo)(()=>{
+        const filteredModels = allModels.filter((m)=>m.available);
+        const defaultModel = filteredModels.find((m)=>m.isDefault);
+        if (defaultModel) {
+            const arr = [
+                defaultModel,
+                ...filteredModels.filter((m)=>m !== defaultModel)
+            ];
+            return arr;
+        } else {
+            return filteredModels;
+        }
+    }, [
         allModels
     ]);
     const [showModelSelector, setShowModelSelector] = (0,react_.useState)(false);
@@ -2095,7 +2107,8 @@ function ChatActions(props) {
         // switch to first available model
         const isUnavaliableModel = !models.some((m)=>m.name === currentModel);
         if (isUnavaliableModel && models.length > 0) {
-            const nextModel = models[0].name;
+            // show next model to default model if exist
+            let nextModel = (models.find((model)=>model.isDefault) || models[0]).name;
             chatStore.updateCurrentSession((session)=>session.mask.modelConfig.model = nextModel);
             (0,ui_lib/* showToast */.CF)(nextModel);
         }

@@ -1207,7 +1207,7 @@ Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_re
 
 /***/ }),
 
-/***/ 42391:
+/***/ 51196:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
 Promise.resolve(/* import() eager */).then(__webpack_require__.bind(__webpack_require__, 82494));
@@ -1332,7 +1332,7 @@ class ChatGPTApi {
             top_p: modelConfig.top_p
         };
         // add max_tokens to vision model
-        if (visionModel) {
+        if (visionModel && modelConfig.model.includes("preview")) {
             requestPayload["max_tokens"] = Math.max(modelConfig.max_tokens, 4000);
         }
         console.log("[Request] openai payload: ", requestPayload);
@@ -1537,7 +1537,6 @@ class GeminiProApi {
     }
     async chat(options) {
         // const apiClient = this;
-        const visionModel = (0,utils/* isVisionModel */.Xf)(options.config.model);
         let multimodal = false;
         const messages = options.messages.map((v)=>{
             let parts = [
@@ -1545,7 +1544,7 @@ class GeminiProApi {
                     text: (0,utils/* getMessageTextContent */.YK)(v)
                 }
             ];
-            if (visionModel) {
+            if ((0,utils/* isVisionModel */.Xf)(options.config.model)) {
                 const images = (0,utils/* getMessageImages */.Bs)(v);
                 if (images.length > 0) {
                     multimodal = true;
@@ -1628,11 +1627,9 @@ class GeminiProApi {
         const controller = new AbortController();
         options.onController?.(controller);
         try {
-            let googleChatPath = visionModel ? constant/* Google */.ie.VisionChatPath(modelConfig.model) : constant/* Google */.ie.ChatPath(modelConfig.model);
-            let chatPath = this.path(googleChatPath);
             // let baseUrl = accessStore.googleUrl;
             if (!baseUrl) {
-                baseUrl = isApp ? constant/* DEFAULT_API_HOST */.Ky + "/api/proxy/google/" + googleChatPath : chatPath;
+                baseUrl = isApp ? constant/* DEFAULT_API_HOST */.Ky + "/api/proxy/google/" + constant/* Google */.ie.ChatPath(modelConfig.model) : this.path(constant/* Google */.ie.ChatPath(modelConfig.model));
             }
             if (isApp) {
                 baseUrl += `?key=${accessStore.googleApiKey}`;
@@ -3741,8 +3738,7 @@ const Azure = {
 };
 const Google = {
     ExampleEndpoint: "https://generativelanguage.googleapis.com/",
-    ChatPath: (modelName)=>`v1beta/models/${modelName}:generateContent`,
-    VisionChatPath: (modelName)=>`v1beta/models/${modelName}:generateContent`
+    ChatPath: (modelName)=>`v1beta/models/${modelName}:generateContent`
 };
 const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
 // export const DEFAULT_SYSTEM_TEMPLATE = `
@@ -3768,8 +3764,6 @@ const KnowledgeCutOffDate = {
     "gpt-4-turbo": "2023-12",
     "gpt-4-turbo-2024-04-09": "2023-12",
     "gpt-4-turbo-preview": "2023-12",
-    "gpt-4-1106-preview": "2023-04",
-    "gpt-4-0125-preview": "2023-12",
     "gpt-4-vision-preview": "2023-04",
     // After improvements,
     // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
@@ -3778,19 +3772,11 @@ const KnowledgeCutOffDate = {
 };
 const openaiModels = [
     "gpt-3.5-turbo",
-    "gpt-3.5-turbo-0301",
-    "gpt-3.5-turbo-0613",
     "gpt-3.5-turbo-1106",
     "gpt-3.5-turbo-0125",
-    "gpt-3.5-turbo-16k",
-    "gpt-3.5-turbo-16k-0613",
     "gpt-4",
-    "gpt-4-0314",
     "gpt-4-0613",
-    "gpt-4-1106-preview",
-    "gpt-4-0125-preview",
     "gpt-4-32k",
-    "gpt-4-32k-0314",
     "gpt-4-32k-0613",
     "gpt-4-turbo",
     "gpt-4-turbo-preview",
@@ -10816,8 +10802,10 @@ if (!Array.prototype.at) {
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(43684);
 /* harmony import */ var _client_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(75224);
 /* harmony import */ var _config_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(39463);
-/* harmony import */ var _utils_store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(35122);
-/* harmony import */ var _utils_clone__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(25157);
+/* harmony import */ var _utils_store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(35122);
+/* harmony import */ var _utils_clone__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(25157);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(71472);
+
 
 
 
@@ -10850,9 +10838,10 @@ const DEFAULT_ACCESS_STATE = {
     hideBalanceQuery: false,
     disableGPT4: false,
     disableFastLink: false,
-    customModels: ""
+    customModels: "",
+    defaultModel: ""
 };
-const useAccessStore = (0,_utils_store__WEBPACK_IMPORTED_MODULE_3__/* .createPersistStore */ .D)({
+const useAccessStore = (0,_utils_store__WEBPACK_IMPORTED_MODULE_4__/* .createPersistStore */ .D)({
     ...DEFAULT_ACCESS_STATE
 }, (set, get)=>({
         enabledAccessControl () {
@@ -10860,31 +10849,31 @@ const useAccessStore = (0,_utils_store__WEBPACK_IMPORTED_MODULE_3__/* .createPer
             return get().needCode;
         },
         isValidOpenAI () {
-            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_5__/* .ensure */ .z)(get(), [
                 "openaiApiKey"
             ]);
         },
         isValidAzure () {
-            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_5__/* .ensure */ .z)(get(), [
                 "azureUrl",
                 "azureApiKey",
                 "azureApiVersion"
             ]);
         },
         isValidGoogle () {
-            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_5__/* .ensure */ .z)(get(), [
                 "googleApiKey"
             ]);
         },
         isValidAnthropic () {
-            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+            return (0,_utils_clone__WEBPACK_IMPORTED_MODULE_5__/* .ensure */ .z)(get(), [
                 "anthropicApiKey"
             ]);
         },
         isAuthorized () {
             this.fetch();
             // has token or has code or disabled access control
-            return this.isValidOpenAI() || this.isValidAzure() || this.isValidGoogle() || this.isValidAnthropic() || !this.enabledAccessControl() || this.enabledAccessControl() && (0,_utils_clone__WEBPACK_IMPORTED_MODULE_4__/* .ensure */ .z)(get(), [
+            return this.isValidOpenAI() || this.isValidAzure() || this.isValidGoogle() || this.isValidAnthropic() || !this.enabledAccessControl() || this.enabledAccessControl() && (0,_utils_clone__WEBPACK_IMPORTED_MODULE_5__/* .ensure */ .z)(get(), [
                 "accessCode"
             ]);
         },
@@ -10898,6 +10887,11 @@ const useAccessStore = (0,_utils_store__WEBPACK_IMPORTED_MODULE_3__/* .createPer
                     ...(0,_client_api__WEBPACK_IMPORTED_MODULE_1__/* .getHeaders */ .wU)()
                 }
             }).then((res)=>res.json()).then((res)=>{
+                // Set default model from env request
+                let defaultModel = res.defaultModel ?? "";
+                _config__WEBPACK_IMPORTED_MODULE_3__/* .DEFAULT_CONFIG */ .g5.modelConfig.model = defaultModel !== "" ? defaultModel : "gpt-3.5-turbo";
+                return res;
+            }).then((res)=>{
                 console.log("[Config] got config from server", res);
                 set(()=>({
                         ...res
@@ -11528,9 +11522,10 @@ const useChatStore = (0,store/* createPersistStore */.D)(DEFAULT_CHAT_STATE, (se
 /* harmony export */   MG: () => (/* binding */ useAppConfig),
 /* harmony export */   Q2: () => (/* binding */ Theme),
 /* harmony export */   Xm: () => (/* binding */ ModalConfigValidator),
+/* harmony export */   g5: () => (/* binding */ DEFAULT_CONFIG),
 /* harmony export */   mQ: () => (/* binding */ SubmitKey)
 /* harmony export */ });
-/* unused harmony exports DEFAULT_CONFIG, limitNumber */
+/* unused harmony export limitNumber */
 /* harmony import */ var _config_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(39463);
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(43684);
 /* harmony import */ var _utils_store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(35122);
@@ -12679,7 +12674,7 @@ function isVisionModel(model) {
 function identifyDefaultClaudeModel(modelName) {
     const accessStore = _store_access__WEBPACK_IMPORTED_MODULE_0__/* .useAccessStore */ ._.getState();
     const configStore = _store_config__WEBPACK_IMPORTED_MODULE_1__/* .useAppConfig */ .MG.getState();
-    const allModals = (0,_model__WEBPACK_IMPORTED_MODULE_2__/* .collectModels */ .H)(configStore.models, [
+    const allModals = (0,_model__WEBPACK_IMPORTED_MODULE_2__/* .collectModels */ .HX)(configStore.models, [
         configStore.customModels,
         accessStore.customModels
     ].join(","));
@@ -12976,9 +12971,15 @@ function merge(target, source) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   H: () => (/* binding */ collectModels)
+/* harmony export */   HX: () => (/* binding */ collectModels),
+/* harmony export */   lW: () => (/* binding */ collectModelsWithDefaultModel)
 /* harmony export */ });
-/* unused harmony export collectModelTable */
+/* unused harmony exports collectModelTable, collectModelTableWithDefaultModel */
+const customProvider = (modelName)=>({
+        id: modelName,
+        providerName: "",
+        providerType: "custom"
+    });
 function collectModelTable(models, customModels) {
     const modelTable = {};
     // default models
@@ -12988,11 +12989,6 @@ function collectModelTable(models, customModels) {
             displayName: m.name
         };
     });
-    const customProvider = (modelName)=>({
-            id: modelName,
-            providerName: "",
-            providerType: "custom"
-        });
     // server custom models
     customModels.split(",").filter((v)=>!!v && v.length > 0).forEach((m)=>{
         const available = !m.startsWith("-");
@@ -13012,10 +13008,29 @@ function collectModelTable(models, customModels) {
     });
     return modelTable;
 }
+function collectModelTableWithDefaultModel(models, customModels, defaultModel) {
+    let modelTable = collectModelTable(models, customModels);
+    if (defaultModel && defaultModel !== "") {
+        delete modelTable[defaultModel];
+        modelTable[defaultModel] = {
+            name: defaultModel,
+            displayName: defaultModel,
+            available: true,
+            provider: modelTable[defaultModel]?.provider ?? customProvider(defaultModel),
+            isDefault: true
+        };
+    }
+    return modelTable;
+}
 /**
  * Generate full model table.
  */ function collectModels(models, customModels) {
     const modelTable = collectModelTable(models, customModels);
+    const allModels = Object.values(modelTable);
+    return allModels;
+}
+function collectModelsWithDefaultModel(models, customModels, defaultModel) {
+    const modelTable = collectModelTableWithDefaultModel(models, customModels, defaultModel);
     const allModels = Object.values(modelTable);
     return allModels;
 }
@@ -13283,8 +13298,7 @@ const Azure = {
 };
 const Google = {
     ExampleEndpoint: "https://generativelanguage.googleapis.com/",
-    ChatPath: (modelName)=>`v1beta/models/${modelName}:generateContent`,
-    VisionChatPath: (modelName)=>`v1beta/models/${modelName}:generateContent`
+    ChatPath: (modelName)=>`v1beta/models/${modelName}:generateContent`
 };
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
 // export const DEFAULT_SYSTEM_TEMPLATE = `
@@ -13310,8 +13324,6 @@ const KnowledgeCutOffDate = {
     "gpt-4-turbo": "2023-12",
     "gpt-4-turbo-2024-04-09": "2023-12",
     "gpt-4-turbo-preview": "2023-12",
-    "gpt-4-1106-preview": "2023-04",
-    "gpt-4-0125-preview": "2023-12",
     "gpt-4-vision-preview": "2023-04",
     // After improvements,
     // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
@@ -13320,19 +13332,11 @@ const KnowledgeCutOffDate = {
 };
 const openaiModels = [
     "gpt-3.5-turbo",
-    "gpt-3.5-turbo-0301",
-    "gpt-3.5-turbo-0613",
     "gpt-3.5-turbo-1106",
     "gpt-3.5-turbo-0125",
-    "gpt-3.5-turbo-16k",
-    "gpt-3.5-turbo-16k-0613",
     "gpt-4",
-    "gpt-4-0314",
     "gpt-4-0613",
-    "gpt-4-1106-preview",
-    "gpt-4-0125-preview",
     "gpt-4-32k",
-    "gpt-4-32k-0314",
     "gpt-4-32k-0613",
     "gpt-4-turbo",
     "gpt-4-turbo-preview",
@@ -13413,9 +13417,11 @@ const getServerSideConfig = ()=>{
     }
     const disableGPT4 = !!process.env.DISABLE_GPT4;
     let customModels = process.env.CUSTOM_MODELS ?? "";
+    let defaultModel = process.env.DEFAULT_MODEL ?? "";
     if (disableGPT4) {
         if (customModels) customModels += ",";
         customModels += DEFAULT_MODELS.filter((m)=>m.name.startsWith("gpt-4")).map((m)=>"-" + m.name).join(",");
+        if (defaultModel.startsWith("gpt-4")) defaultModel = "";
     }
     const isAzure = !!process.env.AZURE_URL;
     const isGoogle = !!process.env.GOOGLE_API_KEY;
@@ -13452,6 +13458,7 @@ const getServerSideConfig = ()=>{
         hideBalanceQuery: !process.env.ENABLE_BALANCE_QUERY,
         disableFastLink: !!process.env.DISABLE_FAST_LINK,
         customModels,
+        defaultModel,
         whiteWebDevEndpoints
     };
 };

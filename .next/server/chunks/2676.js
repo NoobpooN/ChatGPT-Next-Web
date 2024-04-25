@@ -625,10 +625,10 @@ function useAllModels() {
     const accessStore = (0,_store__WEBPACK_IMPORTED_MODULE_1__/* .useAccessStore */ ._X)();
     const configStore = (0,_store__WEBPACK_IMPORTED_MODULE_1__/* .useAppConfig */ .MG)();
     const models = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(()=>{
-        return (0,_model__WEBPACK_IMPORTED_MODULE_2__/* .collectModels */ .H)(configStore.models, [
+        return (0,_model__WEBPACK_IMPORTED_MODULE_2__/* .collectModelsWithDefaultModel */ .lW)(configStore.models, [
             configStore.customModels,
             accessStore.customModels
-        ].join(","));
+        ].join(","), accessStore.defaultModel);
     }, [
         accessStore.customModels,
         configStore.customModels,
