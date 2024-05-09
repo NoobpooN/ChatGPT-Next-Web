@@ -21,25 +21,6 @@
       "wasm": [],
       "assets": []
     },
-    "/api/webdav/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/app/api/webdav/[...path]/route.js"
-      ],
-      "name": "app/api/webdav/[...path]/route",
-      "page": "/api/webdav/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/webdav/(?<path>.+?)$",
-          "originalSource": "/api/webdav/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": []
-    },
     "/api/google/[...path]/route": {
       "files": [
         "server/middleware-build-manifest.js",
@@ -67,6 +48,44 @@
         "iad1",
         "icn1",
         "kix1",
+        "pdx1",
+        "sfo1",
+        "sin1",
+        "syd1"
+      ]
+    },
+    "/api/anthropic/[...path]/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/api/anthropic/[...path]/route.js"
+      ],
+      "name": "app/api/anthropic/[...path]/route",
+      "page": "/api/anthropic/[...path]/route",
+      "matchers": [
+        {
+          "regexp": "^/api/anthropic/(?<path>.+?)$",
+          "originalSource": "/api/anthropic/[...path]"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "regions": [
+        "arn1",
+        "bom1",
+        "cdg1",
+        "cle1",
+        "cpt1",
+        "dub1",
+        "fra1",
+        "gru1",
+        "hnd1",
+        "iad1",
+        "icn1",
+        "kix1",
+        "lhr1",
         "pdx1",
         "sfo1",
         "sin1",
@@ -111,43 +130,24 @@
         "syd1"
       ]
     },
-    "/api/anthropic/[...path]/route": {
+    "/api/webdav/[...path]/route": {
       "files": [
         "server/middleware-build-manifest.js",
         "server/middleware-react-loadable-manifest.js",
         "server/next-font-manifest.js",
         "server/edge-runtime-webpack.js",
-        "server/app/api/anthropic/[...path]/route.js"
+        "server/app/api/webdav/[...path]/route.js"
       ],
-      "name": "app/api/anthropic/[...path]/route",
-      "page": "/api/anthropic/[...path]/route",
+      "name": "app/api/webdav/[...path]/route",
+      "page": "/api/webdav/[...path]/route",
       "matchers": [
         {
-          "regexp": "^/api/anthropic/(?<path>.+?)$",
-          "originalSource": "/api/anthropic/[...path]"
+          "regexp": "^/api/webdav/(?<path>.+?)$",
+          "originalSource": "/api/webdav/[...path]"
         }
       ],
       "wasm": [],
-      "assets": [],
-      "regions": [
-        "arn1",
-        "bom1",
-        "cdg1",
-        "cle1",
-        "cpt1",
-        "dub1",
-        "fra1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "lhr1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
+      "assets": []
     },
     "/api/upstash/[action]/[...key]/route": {
       "files": [

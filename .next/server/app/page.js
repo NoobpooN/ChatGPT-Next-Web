@@ -1842,6 +1842,12 @@ class ClaudeApi {
                 })
             };
         });
+        if (prompt[0]?.role === "assistant") {
+            prompt.unshift({
+                role: "user",
+                content: ";"
+            });
+        }
         const requestBody = {
             messages: prompt,
             stream: shouldStream,
@@ -3546,7 +3552,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 ;// CONCATENATED MODULE: ./src-tauri/tauri.conf.json
-const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.11.3"}}');
+const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.12.2"}}');
 ;// CONCATENATED MODULE: ./app/config/build.ts
 
 const getBuildConfig = ()=>{
@@ -3649,7 +3655,7 @@ function queryMeta(key, defaultValue) {
 /* harmony export */   ym: () => (/* binding */ SlotID),
 /* harmony export */   yp: () => (/* binding */ DEFAULT_SYSTEM_TEMPLATE)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, RUNTIME_CONFIG_DOM, ANTHROPIC_BASE_URL, GEMINI_BASE_URL, MAX_RENDER_MSG_COUNT, internalWhiteWebDavEndpoints */
+/* unused harmony exports OWNER, REPO, RUNTIME_CONFIG_DOM, ANTHROPIC_BASE_URL, GEMINI_BASE_URL, MAX_RENDER_MSG_COUNT, internalAllowedWebDavEndpoints */
 const OWNER = "Yidadaa";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
@@ -3828,7 +3834,7 @@ const DEFAULT_MODELS = [
 const CHAT_PAGE_SIZE = 15;
 const MAX_RENDER_MSG_COUNT = 45;
 // some famous webdav endpoints
-const internalWhiteWebDavEndpoints = (/* unused pure expression or super */ null && ([
+const internalAllowedWebDavEndpoints = (/* unused pure expression or super */ null && ([
     "https://dav.jianguoyun.com/dav/",
     "https://dav.dropdav.com/",
     "https://dav.box.com/dav",
@@ -10976,7 +10982,13 @@ var nanoid = __webpack_require__(35667);
 var store = __webpack_require__(35122);
 // EXTERNAL MODULE: ./app/utils/checkers.ts
 var checkers = __webpack_require__(15897);
+// EXTERNAL MODULE: ./app/utils/model.ts
+var model = __webpack_require__(24914);
+// EXTERNAL MODULE: ./app/store/access.ts
+var access = __webpack_require__(15504);
 ;// CONCATENATED MODULE: ./app/store/chat.ts
+
+
 
 
 
@@ -11023,9 +11035,16 @@ function createEmptySession() {
 function getSummarizeModel(currentModel) {
     // if it is using gpt-* models, force to use 3.5 to summarize
     if (currentModel.startsWith("gpt")) {
-        return constant/* SUMMARIZE_MODEL */.EF;
+        const configStore = store_config/* useAppConfig */.MG.getState();
+        const accessStore = access/* useAccessStore */._.getState();
+        const allModel = (0,model/* collectModelsWithDefaultModel */.lW)(configStore.models, [
+            configStore.customModels,
+            accessStore.customModels
+        ].join(","), accessStore.defaultModel);
+        const summarizeModel = allModel.find((m)=>m.name === constant/* SUMMARIZE_MODEL */.EF && m.available);
+        return summarizeModel?.name ?? currentModel;
     }
-    if (currentModel.startsWith("gemini-pro")) {
+    if (currentModel.startsWith("gemini")) {
         return constant/* GEMINI_SUMMARIZE_MODEL */.PF;
     }
     return currentModel;
@@ -13011,12 +13030,10 @@ function collectModelTable(models, customModels) {
 function collectModelTableWithDefaultModel(models, customModels, defaultModel) {
     let modelTable = collectModelTable(models, customModels);
     if (defaultModel && defaultModel !== "") {
-        delete modelTable[defaultModel];
         modelTable[defaultModel] = {
+            ...modelTable[defaultModel],
             name: defaultModel,
-            displayName: defaultModel,
             available: true,
-            provider: modelTable[defaultModel]?.provider ?? customProvider(defaultModel),
             isDefault: true
         };
     }
@@ -13388,7 +13405,7 @@ const DEFAULT_MODELS = [
 const CHAT_PAGE_SIZE = 15;
 const MAX_RENDER_MSG_COUNT = 45;
 // some famous webdav endpoints
-const internalWhiteWebDavEndpoints = (/* unused pure expression or super */ null && ([
+const internalAllowedWebDavEndpoints = (/* unused pure expression or super */ null && ([
     "https://dav.jianguoyun.com/dav/",
     "https://dav.dropdav.com/",
     "https://dav.box.com/dav",
@@ -13411,6 +13428,16 @@ const ACCESS_CODES = function getAccessCodes() {
         return new Set();
     }
 }();
+function getApiKey(keys) {
+    const apiKeyEnvVar = keys ?? "";
+    const apiKeys = apiKeyEnvVar.split(",").map((v)=>v.trim());
+    const randomIndex = Math.floor(Math.random() * apiKeys.length);
+    const apiKey = apiKeys[randomIndex];
+    if (apiKey) {
+        console.log(`[Server Config] using ${randomIndex + 1} of ${apiKeys.length} api key - ${apiKey}`);
+    }
+    return apiKey;
+}
 const getServerSideConfig = ()=>{
     if (typeof process === "undefined") {
         throw Error("[Server Config] you are importing a nodejs-only module outside of nodejs");
@@ -13426,25 +13453,27 @@ const getServerSideConfig = ()=>{
     const isAzure = !!process.env.AZURE_URL;
     const isGoogle = !!process.env.GOOGLE_API_KEY;
     const isAnthropic = !!process.env.ANTHROPIC_API_KEY;
-    const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
-    const apiKeys = apiKeyEnvVar.split(",").map((v)=>v.trim());
-    const randomIndex = Math.floor(Math.random() * apiKeys.length);
-    const apiKey = apiKeys[randomIndex];
-    console.log(`[Server Config] using ${randomIndex + 1} of ${apiKeys.length} api key`);
-    const whiteWebDevEndpoints = (process.env.WHITE_WEBDEV_ENDPOINTS ?? "").split(",");
+    // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
+    // const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
+    // const randomIndex = Math.floor(Math.random() * apiKeys.length);
+    // const apiKey = apiKeys[randomIndex];
+    // console.log(
+    //   `[Server Config] using ${randomIndex + 1} of ${apiKeys.length} api key`,
+    // );
+    const allowedWebDevEndpoints = (process.env.WHITE_WEBDEV_ENDPOINTS ?? "").split(",");
     return {
         baseUrl: process.env.BASE_URL,
-        apiKey,
+        apiKey: getApiKey(process.env.OPENAI_API_KEY),
         openaiOrgId: process.env.OPENAI_ORG_ID,
         isAzure,
         azureUrl: process.env.AZURE_URL,
-        azureApiKey: process.env.AZURE_API_KEY,
+        azureApiKey: getApiKey(process.env.AZURE_API_KEY),
         azureApiVersion: process.env.AZURE_API_VERSION,
         isGoogle,
-        googleApiKey: process.env.GOOGLE_API_KEY,
+        googleApiKey: getApiKey(process.env.GOOGLE_API_KEY),
         googleUrl: process.env.GOOGLE_URL,
         isAnthropic,
-        anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+        anthropicApiKey: getApiKey(process.env.ANTHROPIC_API_KEY),
         anthropicApiVersion: process.env.ANTHROPIC_API_VERSION,
         anthropicUrl: process.env.ANTHROPIC_URL,
         gtmId: process.env.GTM_ID,
@@ -13459,7 +13488,7 @@ const getServerSideConfig = ()=>{
         disableFastLink: !!process.env.DISABLE_FAST_LINK,
         customModels,
         defaultModel,
-        whiteWebDevEndpoints
+        allowedWebDevEndpoints
     };
 };
 
@@ -13488,7 +13517,7 @@ var markdown = __webpack_require__(65322);
 // EXTERNAL MODULE: ./app/styles/highlight.scss
 var highlight = __webpack_require__(86741);
 ;// CONCATENATED MODULE: ./src-tauri/tauri.conf.json
-const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.11.3"}}');
+const tauri_conf_namespaceObject = JSON.parse('{"DR":{"i":"2.12.2"}}');
 ;// CONCATENATED MODULE: ./app/config/build.ts
 
 const getBuildConfig = ()=>{
