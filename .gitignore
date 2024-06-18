@@ -42,6 +42,7 @@ dev
 # docker-compose env files
 .env
 
+/logs
 *.crt
 *.key
 *.key.pub
