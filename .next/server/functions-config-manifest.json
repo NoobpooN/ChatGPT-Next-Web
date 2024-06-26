@@ -1,1 +1,1 @@
-{"version":1,"functions":{"/api/config":{},"/api/openai/[...path]":{},"/api/google/[...path]":{},"/api/upstash/[action]/[...key]":{},"/api/webdav/[...path]":{},"/api/anthropic/[...path]":{}}}
+{"version":1,"functions":{"/api/config":{},"/api/google/[...path]":{},"/api/openai/[...path]":{},"/api/upstash/[action]/[...key]":{},"/api/webdav/[...path]":{},"/api/anthropic/[...path]":{}}}
