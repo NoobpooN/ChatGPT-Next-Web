@@ -1,1 +1,1 @@
-{"version":1,"functions":{"/api/anthropic/[...path]":{},"/api/azure/[...path]":{},"/api/config":{},"/api/google/[...path]":{},"/api/openai/[...path]":{},"/api/upstash/[action]/[...key]":{},"/api/webdav/[...path]":{}}}
+{"version":1,"functions":{"/api/alibaba/[...path]":{},"/api/anthropic/[...path]":{},"/api/azure/[...path]":{},"/api/baidu/[...path]":{},"/api/bytedance/[...path]":{},"/api/config":{},"/api/google/[...path]":{},"/api/openai/[...path]":{},"/api/upstash/[action]/[...key]":{},"/api/webdav/[...path]":{}}}

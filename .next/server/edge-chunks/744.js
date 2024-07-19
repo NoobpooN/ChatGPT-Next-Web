@@ -1,5 +1,5 @@
 "use strict";
-(self["webpackChunk_N_E"] = self["webpackChunk_N_E"] || []).push([[344],{
+(self["webpackChunk_N_E"] = self["webpackChunk_N_E"] || []).push([[744],{
 
 /***/ 5577:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -72,6 +72,15 @@ function auth(req, modelProvider) {
             case _constant__WEBPACK_IMPORTED_MODULE_2__/* .ModelProvider */ .k8.Claude:
                 systemApiKey = serverConfig.anthropicApiKey;
                 break;
+            case _constant__WEBPACK_IMPORTED_MODULE_2__/* .ModelProvider */ .k8.Doubao:
+                systemApiKey = serverConfig.bytedanceApiKey;
+                break;
+            case _constant__WEBPACK_IMPORTED_MODULE_2__/* .ModelProvider */ .k8.Ernie:
+                systemApiKey = serverConfig.baiduApiKey;
+                break;
+            case _constant__WEBPACK_IMPORTED_MODULE_2__/* .ModelProvider */ .k8.Qwen:
+                systemApiKey = serverConfig.alibabaApiKey;
+                break;
             case _constant__WEBPACK_IMPORTED_MODULE_2__/* .ModelProvider */ .k8.GPT:
             default:
                 if (req.nextUrl.pathname.includes("azure/deployments")) {
@@ -92,126 +101,6 @@ function auth(req, modelProvider) {
     return {
         error: false
     };
-}
-
-
-/***/ }),
-
-/***/ 6718:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   L: () => (/* binding */ requestOpenai)
-/* harmony export */ });
-/* harmony import */ var next_server__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(572);
-/* harmony import */ var _config_server__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9579);
-/* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7736);
-/* harmony import */ var _utils_model__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(413);
-
-
-
-
-const serverConfig = (0,_config_server__WEBPACK_IMPORTED_MODULE_1__/* .getServerSideConfig */ .g)();
-async function requestOpenai(req) {
-    const controller = new AbortController();
-    const isAzure = req.nextUrl.pathname.includes("azure/deployments");
-    var authValue, authHeaderName = "";
-    if (isAzure) {
-        authValue = req.headers.get("Authorization")?.trim().replaceAll("Bearer ", "").trim() ?? "";
-        authHeaderName = "api-key";
-    } else {
-        authValue = req.headers.get("Authorization") ?? "";
-        authHeaderName = "Authorization";
-    }
-    let path = `${req.nextUrl.pathname}${req.nextUrl.search}`.replaceAll("/api/openai/", "");
-    let baseUrl = serverConfig.azureUrl || serverConfig.baseUrl || _constant__WEBPACK_IMPORTED_MODULE_2__/* .OPENAI_BASE_URL */ .Bi;
-    if (!baseUrl.startsWith("http")) {
-        baseUrl = `https://${baseUrl}`;
-    }
-    if (baseUrl.endsWith("/")) {
-        baseUrl = baseUrl.slice(0, -1);
-    }
-    console.log("[Proxy] ", path);
-    console.log("[Base Url]", baseUrl);
-    const timeoutId = setTimeout(()=>{
-        controller.abort();
-    }, 10 * 60 * 1000);
-    if (isAzure) {
-        const azureApiVersion = req?.nextUrl?.searchParams?.get("api-version") || serverConfig.azureApiVersion;
-        baseUrl = baseUrl.split("/deployments").shift();
-        path = `${req.nextUrl.pathname.replaceAll("/api/azure/", "")}?api-version=${azureApiVersion}`;
-    }
-    const fetchUrl = `${baseUrl}/${path}`;
-    const fetchOptions = {
-        headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-store",
-            [authHeaderName]: authValue,
-            ...serverConfig.openaiOrgId && {
-                "OpenAI-Organization": serverConfig.openaiOrgId
-            }
-        },
-        method: req.method,
-        body: req.body,
-        // to fix #2485: https://stackoverflow.com/questions/55920957/cloudflare-worker-typeerror-one-time-use-body
-        redirect: "manual",
-        // @ts-ignore
-        duplex: "half",
-        signal: controller.signal
-    };
-    // #1815 try to refuse gpt4 request
-    if (serverConfig.customModels && req.body) {
-        try {
-            const clonedBody = await req.text();
-            fetchOptions.body = clonedBody;
-            const jsonBody = JSON.parse(clonedBody);
-            // not undefined and is false
-            if ((0,_utils_model__WEBPACK_IMPORTED_MODULE_3__/* .isModelAvailableInServer */ .pw)(serverConfig.customModels, jsonBody?.model, _constant__WEBPACK_IMPORTED_MODULE_2__/* .ServiceProvider */ .UT.OpenAI) || (0,_utils_model__WEBPACK_IMPORTED_MODULE_3__/* .isModelAvailableInServer */ .pw)(serverConfig.customModels, jsonBody?.model, _constant__WEBPACK_IMPORTED_MODULE_2__/* .ServiceProvider */ .UT.Azure)) {
-                return next_server__WEBPACK_IMPORTED_MODULE_0__/* .NextResponse */ .xk.json({
-                    error: true,
-                    message: `you are not allowed to use ${jsonBody?.model} model`
-                }, {
-                    status: 403
-                });
-            }
-        } catch (e) {
-            console.error("[OpenAI] gpt4 filter", e);
-        }
-    }
-    try {
-        const res = await fetch(fetchUrl, fetchOptions);
-        // Extract the OpenAI-Organization header from the response
-        const openaiOrganizationHeader = res.headers.get("OpenAI-Organization");
-        // Check if serverConfig.openaiOrgId is defined and not an empty string
-        if (serverConfig.openaiOrgId && serverConfig.openaiOrgId.trim() !== "") {
-            // If openaiOrganizationHeader is present, log it; otherwise, log that the header is not present
-            console.log("[Org ID]", openaiOrganizationHeader);
-        } else {
-            console.log("[Org ID] is not set up.");
-        }
-        // to prevent browser prompt for credentials
-        const newHeaders = new Headers(res.headers);
-        newHeaders.delete("www-authenticate");
-        // to disable nginx buffering
-        newHeaders.set("X-Accel-Buffering", "no");
-        // Conditionally delete the OpenAI-Organization header from the response if [Org ID] is undefined or empty (not setup in ENV)
-        // Also, this is to prevent the header from being sent to the client
-        if (!serverConfig.openaiOrgId || serverConfig.openaiOrgId.trim() === "") {
-            newHeaders.delete("OpenAI-Organization");
-        }
-        // The latest version of the OpenAI API forced the content-encoding to be "br" in json response
-        // So if the streaming is disabled, we need to remove the content-encoding header
-        // Because Vercel uses gzip to compress the response, if we don't remove the content-encoding header
-        // The browser will try to decode the response with brotli and fail
-        newHeaders.delete("content-encoding");
-        return new Response(res.body, {
-            status: res.status,
-            statusText: res.statusText,
-            headers: newHeaders
-        });
-    } finally{
-        clearTimeout(timeoutId);
-    }
 }
 
 
@@ -262,6 +151,9 @@ const getServerSideConfig = ()=>{
     const isAzure = !!process.env.AZURE_URL;
     const isGoogle = !!process.env.GOOGLE_API_KEY;
     const isAnthropic = !!process.env.ANTHROPIC_API_KEY;
+    const isBaidu = !!process.env.BAIDU_API_KEY;
+    const isBytedance = !!process.env.BYTEDANCE_API_KEY;
+    const isAlibaba = !!process.env.ALIBABA_API_KEY;
     // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
     // const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
     // const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -285,6 +177,16 @@ const getServerSideConfig = ()=>{
         anthropicApiKey: getApiKey(process.env.ANTHROPIC_API_KEY),
         anthropicApiVersion: process.env.ANTHROPIC_API_VERSION,
         anthropicUrl: process.env.ANTHROPIC_URL,
+        isBaidu,
+        baiduUrl: process.env.BAIDU_URL,
+        baiduApiKey: getApiKey(process.env.BAIDU_API_KEY),
+        baiduSecretKey: process.env.BAIDU_SECRET_KEY,
+        isBytedance,
+        bytedanceApiKey: getApiKey(process.env.BYTEDANCE_API_KEY),
+        bytedanceUrl: process.env.BYTEDANCE_URL,
+        isAlibaba,
+        alibabaUrl: process.env.ALIBABA_URL,
+        alibabaApiKey: getApiKey(process.env.ALIBABA_API_KEY),
         gtmId: process.env.GTM_ID,
         needCode: ACCESS_CODES.size > 0,
         code: process.env.CODE,
@@ -309,6 +211,7 @@ const getServerSideConfig = ()=>{
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Bi: () => (/* binding */ OPENAI_BASE_URL),
+/* harmony export */   FR: () => (/* binding */ BAIDU_OATUH_URL),
 /* harmony export */   Fv: () => (/* binding */ DEFAULT_MODELS),
 /* harmony export */   Hm: () => (/* binding */ GEMINI_BASE_URL),
 /* harmony export */   L: () => (/* binding */ ApiPath),
@@ -317,11 +220,14 @@ const getServerSideConfig = ()=>{
 /* harmony export */   UT: () => (/* binding */ ServiceProvider),
 /* harmony export */   Uf: () => (/* binding */ STORAGE_KEY),
 /* harmony export */   YU: () => (/* binding */ Anthropic),
+/* harmony export */   ik: () => (/* binding */ BYTEDANCE_BASE_URL),
 /* harmony export */   k8: () => (/* binding */ ModelProvider),
 /* harmony export */   mX: () => (/* binding */ OpenaiPath),
+/* harmony export */   n9: () => (/* binding */ BAIDU_BASE_URL),
+/* harmony export */   x5: () => (/* binding */ ALIBABA_BASE_URL),
 /* harmony export */   y3: () => (/* binding */ ANTHROPIC_BASE_URL)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, DEFAULT_API_HOST, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, Azure, Google, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT */
+/* unused harmony exports OWNER, REPO, REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, DEFAULT_API_HOST, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, Azure, Google, Baidu, ByteDance, Alibaba, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT */
 const OWNER = "Yidadaa";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = (/* unused pure expression or super */ null && (`https://github.com/${OWNER}/${REPO}`));
@@ -335,6 +241,10 @@ const DEFAULT_API_HOST = "https://api.nextchat.dev";
 const OPENAI_BASE_URL = "https://api.openai.com";
 const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
+const BAIDU_BASE_URL = "https://aip.baidubce.com";
+const BAIDU_OATUH_URL = `${BAIDU_BASE_URL}/oauth/2.0/token`;
+const BYTEDANCE_BASE_URL = "https://ark.cn-beijing.volces.com";
+const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
 var Path;
 (function(Path) {
     Path["Home"] = "/";
@@ -350,6 +260,10 @@ var ApiPath;
     ApiPath["Azure"] = "/api/azure";
     ApiPath["OpenAI"] = "/api/openai";
     ApiPath["Anthropic"] = "/api/anthropic";
+    ApiPath["Google"] = "/api/google";
+    ApiPath["Baidu"] = "/api/baidu";
+    ApiPath["ByteDance"] = "/api/bytedance";
+    ApiPath["Alibaba"] = "/api/alibaba";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
 (function(SlotID) {
@@ -387,12 +301,18 @@ var ServiceProvider;
     ServiceProvider["Azure"] = "Azure";
     ServiceProvider["Google"] = "Google";
     ServiceProvider["Anthropic"] = "Anthropic";
+    ServiceProvider["Baidu"] = "Baidu";
+    ServiceProvider["ByteDance"] = "ByteDance";
+    ServiceProvider["Alibaba"] = "Alibaba";
 })(ServiceProvider || (ServiceProvider = {}));
 var ModelProvider;
 (function(ModelProvider) {
     ModelProvider["GPT"] = "GPT";
     ModelProvider["GeminiPro"] = "GeminiPro";
     ModelProvider["Claude"] = "Claude";
+    ModelProvider["Ernie"] = "Ernie";
+    ModelProvider["Doubao"] = "Doubao";
+    ModelProvider["Qwen"] = "Qwen";
 })(ModelProvider || (ModelProvider = {}));
 const Anthropic = {
     ChatPath: "v1/messages",
@@ -412,7 +332,37 @@ const Azure = {
 };
 const Google = {
     ExampleEndpoint: "https://generativelanguage.googleapis.com/",
-    ChatPath: (modelName)=>`v1beta/models/${modelName}:generateContent`
+    ChatPath: (modelName)=>`v1beta/models/${modelName}:streamGenerateContent`
+};
+const Baidu = {
+    ExampleEndpoint: BAIDU_BASE_URL,
+    ChatPath: (modelName)=>{
+        let endpoint = modelName;
+        if (modelName === "ernie-4.0-8k") {
+            endpoint = "completions_pro";
+        }
+        if (modelName === "ernie-4.0-8k-preview-0518") {
+            endpoint = "completions_adv_pro";
+        }
+        if (modelName === "ernie-3.5-8k") {
+            endpoint = "completions";
+        }
+        if (modelName === "ernie-speed-128k") {
+            endpoint = "ernie-speed-128k";
+        }
+        if (modelName === "ernie-speed-8k") {
+            endpoint = "ernie_speed";
+        }
+        return `rpc/2.0/ai_custom/v1/wenxinworkshop/chat/${endpoint}`;
+    }
+};
+const ByteDance = {
+    ExampleEndpoint: "https://ark.cn-beijing.volces.com/api/",
+    ChatPath: "api/v3/chat/completions"
+};
+const Alibaba = {
+    ExampleEndpoint: ALIBABA_BASE_URL,
+    ChatPath: "v1/services/aigc/text-generation/generation"
 };
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
 // export const DEFAULT_SYSTEM_TEMPLATE = `
@@ -440,6 +390,8 @@ const KnowledgeCutOffDate = {
     "gpt-4-turbo-preview": "2023-12",
     "gpt-4o": "2023-10",
     "gpt-4o-2024-05-13": "2023-10",
+    "gpt-4o-mini": "2023-10",
+    "gpt-4o-mini-2024-07-18": "2023-10",
     "gpt-4-vision-preview": "2023-04",
     // After improvements,
     // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
@@ -458,6 +410,8 @@ const openaiModels = [
     "gpt-4-turbo-preview",
     "gpt-4o",
     "gpt-4o-2024-05-13",
+    "gpt-4o-mini",
+    "gpt-4o-mini-2024-07-18",
     "gpt-4-vision-preview",
     "gpt-4-turbo-2024-04-09",
     "gpt-4-1106-preview"
@@ -476,6 +430,36 @@ const anthropicModels = [
     "claude-3-opus-20240229",
     "claude-3-haiku-20240307",
     "claude-3-5-sonnet-20240620"
+];
+const baiduModels = [
+    "ernie-4.0-turbo-8k",
+    "ernie-4.0-8k",
+    "ernie-4.0-8k-preview",
+    "ernie-4.0-8k-preview-0518",
+    "ernie-4.0-8k-latest",
+    "ernie-3.5-8k",
+    "ernie-3.5-8k-0205",
+    "ernie-speed-128k",
+    "ernie-speed-8k",
+    "ernie-lite-8k",
+    "ernie-tiny-8k"
+];
+const bytedanceModels = [
+    "Doubao-lite-4k",
+    "Doubao-lite-32k",
+    "Doubao-lite-128k",
+    "Doubao-pro-4k",
+    "Doubao-pro-32k",
+    "Doubao-pro-128k"
+];
+const alibabaModes = [
+    "qwen-turbo",
+    "qwen-plus",
+    "qwen-max",
+    "qwen-max-0428",
+    "qwen-max-0403",
+    "qwen-max-0107",
+    "qwen-max-longcontext"
 ];
 const DEFAULT_MODELS = [
     ...openaiModels.map((name)=>({
@@ -512,6 +496,33 @@ const DEFAULT_MODELS = [
                 id: "anthropic",
                 providerName: "Anthropic",
                 providerType: "anthropic"
+            }
+        })),
+    ...baiduModels.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "baidu",
+                providerName: "Baidu",
+                providerType: "baidu"
+            }
+        })),
+    ...bytedanceModels.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "bytedance",
+                providerName: "ByteDance",
+                providerType: "bytedance"
+            }
+        })),
+    ...alibabaModes.map((name)=>({
+            name,
+            available: true,
+            provider: {
+                id: "alibaba",
+                providerName: "Alibaba",
+                providerType: "alibaba"
             }
         }))
 ];
@@ -584,9 +595,9 @@ function* chunks(s, maxBytes = 1000 * 1000) {
 /* unused harmony exports collectModelTable, collectModelTableWithDefaultModel, collectModels, collectModelsWithDefaultModel */
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7736);
 
-const customProvider = (modelName)=>({
-        id: modelName,
-        providerName: "Custom",
+const customProvider = (providerName)=>({
+        id: providerName.toLowerCase(),
+        providerName: providerName,
         providerType: "custom"
     });
 function collectModelTable(models, customModels) {
@@ -603,17 +614,27 @@ function collectModelTable(models, customModels) {
     customModels.split(",").filter((v)=>!!v && v.length > 0).forEach((m)=>{
         const available = !m.startsWith("-");
         const nameConfig = m.startsWith("+") || m.startsWith("-") ? m.slice(1) : m;
-        const [name, displayName] = nameConfig.split("=");
+        let [name, displayName] = nameConfig.split("=");
         // enable or disable all models
         if (name === "all") {
             Object.values(modelTable).forEach((model)=>model.available = available);
         } else {
-            // 1. find model by name(), and set available value
+            // 1. find model by name, and set available value
+            const [customModelName, customProviderName] = name.split("@");
             let count = 0;
             for(const fullName in modelTable){
-                if (fullName.split("@").shift() == name) {
+                const [modelName, providerName] = fullName.split("@");
+                if (customModelName == modelName && (customProviderName === undefined || customProviderName === providerName)) {
                     count += 1;
                     modelTable[fullName]["available"] = available;
+                    // swap name and displayName for bytedance
+                    if (providerName === "bytedance") {
+                        [name, displayName] = [
+                            displayName,
+                            modelName
+                        ];
+                        modelTable[fullName]["name"] = name;
+                    }
                     if (displayName) {
                         modelTable[fullName]["displayName"] = displayName;
                     }
@@ -621,10 +642,18 @@ function collectModelTable(models, customModels) {
             }
             // 2. if model not exists, create new model with available value
             if (count === 0) {
-                const provider = customProvider(name);
-                modelTable[`${name}@${provider?.id}`] = {
-                    name,
-                    displayName: displayName || name,
+                let [customModelName, customProviderName] = name.split("@");
+                const provider = customProvider(customProviderName || customModelName);
+                // swap name and displayName for bytedance
+                if (displayName && provider.providerName == "ByteDance") {
+                    [customModelName, displayName] = [
+                        displayName,
+                        customModelName
+                    ];
+                }
+                modelTable[`${customModelName}@${provider?.id}`] = {
+                    name: customModelName,
+                    displayName: displayName || customModelName,
                     available,
                     provider
                 };
@@ -667,4 +696,4 @@ function isModelAvailableInServer(customModels, modelName, providerName) {
 /***/ })
 
 }]);
-//# sourceMappingURL=344.js.map
+//# sourceMappingURL=744.js.map
