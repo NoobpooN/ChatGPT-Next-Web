@@ -227,7 +227,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   x5: () => (/* binding */ ALIBABA_BASE_URL),
 /* harmony export */   y3: () => (/* binding */ ANTHROPIC_BASE_URL)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, DEFAULT_API_HOST, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, Azure, Google, Baidu, ByteDance, Alibaba, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT */
+/* unused harmony exports OWNER, REPO, REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, DEFAULT_API_HOST, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Azure, Google, Baidu, ByteDance, Alibaba, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT */
 const OWNER = "Yidadaa";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = (/* unused pure expression or super */ null && (`https://github.com/${OWNER}/${REPO}`));
@@ -245,6 +245,8 @@ const BAIDU_BASE_URL = "https://aip.baidubce.com";
 const BAIDU_OATUH_URL = `${BAIDU_BASE_URL}/oauth/2.0/token`;
 const BYTEDANCE_BASE_URL = "https://ark.cn-beijing.volces.com";
 const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
+const CACHE_URL_PREFIX = "/api/cache";
+const UPLOAD_URL = (/* unused pure expression or super */ null && (`${CACHE_URL_PREFIX}/upload`));
 var Path;
 (function(Path) {
     Path["Home"] = "/";
@@ -305,6 +307,13 @@ var ServiceProvider;
     ServiceProvider["ByteDance"] = "ByteDance";
     ServiceProvider["Alibaba"] = "Alibaba";
 })(ServiceProvider || (ServiceProvider = {}));
+var GoogleSafetySettingsThreshold;
+(function(GoogleSafetySettingsThreshold) {
+    GoogleSafetySettingsThreshold["BLOCK_NONE"] = "BLOCK_NONE";
+    GoogleSafetySettingsThreshold["BLOCK_ONLY_HIGH"] = "BLOCK_ONLY_HIGH";
+    GoogleSafetySettingsThreshold["BLOCK_MEDIUM_AND_ABOVE"] = "BLOCK_MEDIUM_AND_ABOVE";
+    GoogleSafetySettingsThreshold["BLOCK_LOW_AND_ABOVE"] = "BLOCK_LOW_AND_ABOVE";
+})(GoogleSafetySettingsThreshold || (GoogleSafetySettingsThreshold = {}));
 var ModelProvider;
 (function(ModelProvider) {
     ModelProvider["GPT"] = "GPT";
@@ -347,9 +356,6 @@ const Baidu = {
         if (modelName === "ernie-3.5-8k") {
             endpoint = "completions";
         }
-        if (modelName === "ernie-speed-128k") {
-            endpoint = "ernie-speed-128k";
-        }
         if (modelName === "ernie-speed-8k") {
             endpoint = "ernie_speed";
         }
@@ -381,7 +387,7 @@ Current time: {{time}}
 Latex inline: \\(x^2\\) 
 Latex block: $$e=mc^2$$
 `));
-const SUMMARIZE_MODEL = "gpt-3.5-turbo";
+const SUMMARIZE_MODEL = "gpt-4o-mini";
 const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
 const KnowledgeCutOffDate = {
     default: "2021-09",
