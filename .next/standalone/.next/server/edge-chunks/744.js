@@ -66,6 +66,9 @@ function auth(req, modelProvider) {
         //     : serverConfig.apiKey;
         let systemApiKey;
         switch(modelProvider){
+            case _constant__WEBPACK_IMPORTED_MODULE_2__/* .ModelProvider */ .k8.Stability:
+                systemApiKey = serverConfig.stabilityApiKey;
+                break;
             case _constant__WEBPACK_IMPORTED_MODULE_2__/* .ModelProvider */ .k8.GeminiPro:
                 systemApiKey = serverConfig.googleApiKey;
                 break;
@@ -148,6 +151,7 @@ const getServerSideConfig = ()=>{
         customModels += _constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_MODELS */ .Fv.filter((m)=>m.name.startsWith("gpt-4")).map((m)=>"-" + m.name).join(",");
         if (defaultModel.startsWith("gpt-4")) defaultModel = "";
     }
+    const isStability = !!process.env.STABILITY_API_KEY;
     const isAzure = !!process.env.AZURE_URL;
     const isGoogle = !!process.env.GOOGLE_API_KEY;
     const isAnthropic = !!process.env.ANTHROPIC_API_KEY;
@@ -166,6 +170,9 @@ const getServerSideConfig = ()=>{
         baseUrl: process.env.BASE_URL,
         apiKey: getApiKey(process.env.OPENAI_API_KEY),
         openaiOrgId: process.env.OPENAI_ORG_ID,
+        isStability,
+        stabilityUrl: process.env.STABILITY_URL,
+        stabilityApiKey: getApiKey(process.env.STABILITY_API_KEY),
         isAzure,
         azureUrl: process.env.AZURE_URL,
         azureApiKey: getApiKey(process.env.AZURE_API_KEY),
@@ -224,10 +231,11 @@ const getServerSideConfig = ()=>{
 /* harmony export */   k8: () => (/* binding */ ModelProvider),
 /* harmony export */   mX: () => (/* binding */ OpenaiPath),
 /* harmony export */   n9: () => (/* binding */ BAIDU_BASE_URL),
+/* harmony export */   rT: () => (/* binding */ STABILITY_BASE_URL),
 /* harmony export */   x5: () => (/* binding */ ALIBABA_BASE_URL),
 /* harmony export */   y3: () => (/* binding */ ANTHROPIC_BASE_URL)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, DEFAULT_API_HOST, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Azure, Google, Baidu, ByteDance, Alibaba, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT */
+/* unused harmony exports OWNER, REPO, REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, DEFAULT_API_HOST, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, PLUGINS */
 const OWNER = "Yidadaa";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = (/* unused pure expression or super */ null && (`https://github.com/${OWNER}/${REPO}`));
@@ -237,6 +245,7 @@ const RELEASE_URL = (/* unused pure expression or super */ null && (`${REPO_URL}
 const FETCH_COMMIT_URL = (/* unused pure expression or super */ null && (`https://api.github.com/repos/${OWNER}/${REPO}/commits?per_page=1`));
 const FETCH_TAG_URL = (/* unused pure expression or super */ null && (`https://api.github.com/repos/${OWNER}/${REPO}/tags?per_page=1`));
 const RUNTIME_CONFIG_DOM = "danger-runtime-config";
+const STABILITY_BASE_URL = "https://api.stability.ai";
 const DEFAULT_API_HOST = "https://api.nextchat.dev";
 const OPENAI_BASE_URL = "https://api.openai.com";
 const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
@@ -255,6 +264,8 @@ var Path;
     Path["NewChat"] = "/new-chat";
     Path["Masks"] = "/masks";
     Path["Auth"] = "/auth";
+    Path["Sd"] = "/sd";
+    Path["SdNew"] = "/sd-new";
 })(Path || (Path = {}));
 var ApiPath;
 (function(ApiPath) {
@@ -266,6 +277,7 @@ var ApiPath;
     ApiPath["Baidu"] = "/api/baidu";
     ApiPath["ByteDance"] = "/api/bytedance";
     ApiPath["Alibaba"] = "/api/alibaba";
+    ApiPath["Stability"] = "/api/stability";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
 (function(SlotID) {
@@ -286,6 +298,7 @@ var StoreKey;
     StoreKey["Prompt"] = "prompt-store";
     StoreKey["Update"] = "chat-update";
     StoreKey["Sync"] = "sync";
+    StoreKey["SdList"] = "sd-list";
 })(StoreKey || (StoreKey = {}));
 const DEFAULT_SIDEBAR_WIDTH = 300;
 const MAX_SIDEBAR_WIDTH = 500;
@@ -306,6 +319,7 @@ var ServiceProvider;
     ServiceProvider["Baidu"] = "Baidu";
     ServiceProvider["ByteDance"] = "ByteDance";
     ServiceProvider["Alibaba"] = "Alibaba";
+    ServiceProvider["Stability"] = "Stability";
 })(ServiceProvider || (ServiceProvider = {}));
 var GoogleSafetySettingsThreshold;
 (function(GoogleSafetySettingsThreshold) {
@@ -316,6 +330,7 @@ var GoogleSafetySettingsThreshold;
 })(GoogleSafetySettingsThreshold || (GoogleSafetySettingsThreshold = {}));
 var ModelProvider;
 (function(ModelProvider) {
+    ModelProvider["Stability"] = "Stability";
     ModelProvider["GPT"] = "GPT";
     ModelProvider["GeminiPro"] = "GeminiPro";
     ModelProvider["Claude"] = "Claude";
@@ -323,6 +338,10 @@ var ModelProvider;
     ModelProvider["Doubao"] = "Doubao";
     ModelProvider["Qwen"] = "Qwen";
 })(ModelProvider || (ModelProvider = {}));
+const Stability = {
+    GeneratePath: "v2beta/stable-image/generate",
+    ExampleEndpoint: "https://api.stability.ai"
+};
 const Anthropic = {
     ChatPath: "v1/messages",
     ChatPath1: "v1/complete",
@@ -546,6 +565,12 @@ const internalAllowedWebDavEndpoints = [
     "https://webdav.yandex.com",
     "https://app.koofr.net/dav/Koofr"
 ];
+const PLUGINS = [
+    {
+        name: "Stable Diffusion",
+        path: "/sd"
+    }
+];
 
 
 /***/ }),
@@ -671,12 +696,18 @@ function collectModelTable(models, customModels) {
 function collectModelTableWithDefaultModel(models, customModels, defaultModel) {
     let modelTable = collectModelTable(models, customModels);
     if (defaultModel && defaultModel !== "") {
-        modelTable[defaultModel] = {
-            ...modelTable[defaultModel],
-            name: defaultModel,
-            available: true,
-            isDefault: true
-        };
+        if (defaultModel.includes("@")) {
+            if (defaultModel in modelTable) {
+                modelTable[defaultModel].isDefault = true;
+            }
+        } else {
+            for (const key of Object.keys(modelTable)){
+                if (modelTable[key].available && key.split("@").shift() == defaultModel) {
+                    modelTable[key].isDefault = true;
+                    break;
+                }
+            }
+        }
     }
     return modelTable;
 }
