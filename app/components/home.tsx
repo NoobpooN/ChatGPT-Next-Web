@@ -39,6 +39,10 @@ export function Loading(props: { noLogo?: boolean }) {
   );
 }
 
+const Artifacts = dynamic(async () => (await import("./artifacts")).Artifacts, {
+  loading: () => <Loading noLogo />,
+});
+
 const Settings = dynamic(async () => (await import("./settings")).Settings, {
   loading: () => <Loading noLogo />,
 });
@@ -54,6 +58,13 @@ const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
 const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
   loading: () => <Loading noLogo />,
 });
+
+const SearchChat = dynamic(
+  async () => (await import("./search-chat")).SearchChatPage,
+  {
+    loading: () => <Loading noLogo />,
+  },
+);
 
 const Sd = dynamic(async () => (await import("./sd")).Sd, {
   loading: () => <Loading noLogo />,
@@ -137,6 +148,7 @@ export function WindowContent(props: { children: React.ReactNode }) {
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
+  const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
   const isSd = location.pathname === Path.Sd;
@@ -150,6 +162,13 @@ function Screen() {
     loadAsyncGoogleFont();
   }, []);
 
+  if (isArtifact) {
+    return (
+      <Routes>
+        <Route path="/artifacts/:id" element={<Artifacts />} />
+      </Routes>
+    );
+  }
   const renderContent = () => {
     if (isAuth) return <AuthPage />;
     if (isSd) return <Sd />;
@@ -162,6 +181,7 @@ function Screen() {
             <Route path={Path.Home} element={<Chat />} />
             <Route path={Path.NewChat} element={<NewChat />} />
             <Route path={Path.Masks} element={<MaskPage />} />
+            <Route path={Path.SearchChat} element={<SearchChat />} />
             <Route path={Path.Chat} element={<Chat />} />
             <Route path={Path.Settings} element={<Settings />} />
           </Routes>
