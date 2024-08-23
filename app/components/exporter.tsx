@@ -539,15 +539,8 @@ export function ImagePreviewer(props: {
           </div>
 
           <div>
-<<<<<<< HEAD
             <div className={styles["main-title"]}>Artificial Imbecile</div>
             <div className={styles["sub-title"]}>{mask.modelConfig.model}</div>
-=======
-            <div className={styles["main-title"]}>NextChat</div>
-            <div className={styles["sub-title"]}>
-              github.com/ChatGPTNextWeb/ChatGPT-Next-Web
-            </div>
->>>>>>> 4ec6b067e7964f055bd003fe3696477e23b2bd39
             <div className={styles["icons"]}>
               <ExportAvatar avatar={config.avatar} />
               <span className={styles["icon-space"]}>&</span>
