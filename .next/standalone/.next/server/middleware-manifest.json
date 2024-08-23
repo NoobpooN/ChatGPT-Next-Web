@@ -2,90 +2,6 @@
   "sortedMiddleware": [],
   "middleware": {},
   "functions": {
-    "/api/alibaba/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "prerender-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/edge-chunks/297.js",
-        "server/edge-chunks/45.js",
-        "server/edge-chunks/744.js",
-        "server/app/api/alibaba/[...path]/route.js"
-      ],
-      "name": "app/api/alibaba/[...path]/route",
-      "page": "/api/alibaba/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/alibaba/(?<path>.+?)$",
-          "originalSource": "/api/alibaba/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": [],
-      "regions": [
-        "arn1",
-        "bom1",
-        "cdg1",
-        "cle1",
-        "cpt1",
-        "dub1",
-        "fra1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "lhr1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
-    },
-    "/api/bytedance/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "prerender-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/edge-chunks/297.js",
-        "server/edge-chunks/45.js",
-        "server/edge-chunks/744.js",
-        "server/app/api/bytedance/[...path]/route.js"
-      ],
-      "name": "app/api/bytedance/[...path]/route",
-      "page": "/api/bytedance/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/bytedance/(?<path>.+?)$",
-          "originalSource": "/api/bytedance/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": [],
-      "regions": [
-        "arn1",
-        "bom1",
-        "cdg1",
-        "cle1",
-        "cpt1",
-        "dub1",
-        "fra1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "lhr1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
-    },
     "/api/config/route": {
       "files": [
         "server/middleware-build-manifest.js",
@@ -108,7 +24,7 @@
       "wasm": [],
       "assets": []
     },
-    "/api/baidu/[...path]/route": {
+    "/api/artifacts/route": {
       "files": [
         "server/middleware-build-manifest.js",
         "server/middleware-react-loadable-manifest.js",
@@ -117,138 +33,18 @@
         "server/edge-runtime-webpack.js",
         "server/edge-chunks/297.js",
         "server/edge-chunks/45.js",
-        "server/edge-chunks/744.js",
-        "server/app/api/baidu/[...path]/route.js"
+        "server/app/api/artifacts/route.js"
       ],
-      "name": "app/api/baidu/[...path]/route",
-      "page": "/api/baidu/[...path]/route",
+      "name": "app/api/artifacts/route",
+      "page": "/api/artifacts/route",
       "matchers": [
         {
-          "regexp": "^/api/baidu/(?<path>.+?)$",
-          "originalSource": "/api/baidu/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": [],
-      "regions": [
-        "arn1",
-        "bom1",
-        "cdg1",
-        "cle1",
-        "cpt1",
-        "dub1",
-        "fra1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "lhr1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
-    },
-    "/api/stability/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "prerender-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/edge-chunks/297.js",
-        "server/edge-chunks/45.js",
-        "server/app/api/stability/[...path]/route.js"
-      ],
-      "name": "app/api/stability/[...path]/route",
-      "page": "/api/stability/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/stability/(?<path>.+?)$",
-          "originalSource": "/api/stability/[...path]"
+          "regexp": "^/api/artifacts$",
+          "originalSource": "/api/artifacts"
         }
       ],
       "wasm": [],
       "assets": []
-    },
-    "/api/openai/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "prerender-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/edge-chunks/297.js",
-        "server/edge-chunks/45.js",
-        "server/edge-chunks/744.js",
-        "server/app/api/openai/[...path]/route.js"
-      ],
-      "name": "app/api/openai/[...path]/route",
-      "page": "/api/openai/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/openai/(?<path>.+?)$",
-          "originalSource": "/api/openai/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": [],
-      "regions": [
-        "arn1",
-        "bom1",
-        "cdg1",
-        "cle1",
-        "cpt1",
-        "dub1",
-        "fra1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "lhr1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
-    },
-    "/api/google/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "prerender-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/edge-chunks/297.js",
-        "server/edge-chunks/45.js",
-        "server/app/api/google/[...path]/route.js"
-      ],
-      "name": "app/api/google/[...path]/route",
-      "page": "/api/google/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/google/(?<path>.+?)$",
-          "originalSource": "/api/google/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": [],
-      "regions": [
-        "bom1",
-        "cle1",
-        "cpt1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
     },
     "/api/upstash/[action]/[...key]/route": {
       "files": [
@@ -271,6 +67,90 @@
       "wasm": [],
       "assets": []
     },
+    "/api/[provider]/[...path]/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "prerender-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/edge-chunks/297.js",
+        "server/edge-chunks/45.js",
+        "server/edge-chunks/276.js",
+        "server/app/api/[provider]/[...path]/route.js"
+      ],
+      "name": "app/api/[provider]/[...path]/route",
+      "page": "/api/[provider]/[...path]/route",
+      "matchers": [
+        {
+          "regexp": "^/api/(?<provider>[^/]+?)/(?<path>.+?)$",
+          "originalSource": "/api/[provider]/[...path]"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "regions": [
+        "arn1",
+        "bom1",
+        "cdg1",
+        "cle1",
+        "cpt1",
+        "dub1",
+        "fra1",
+        "gru1",
+        "hnd1",
+        "iad1",
+        "icn1",
+        "kix1",
+        "lhr1",
+        "pdx1",
+        "sfo1",
+        "sin1",
+        "syd1"
+      ]
+    },
+    "/api/tencent/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "prerender-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/edge-chunks/297.js",
+        "server/edge-chunks/45.js",
+        "server/edge-chunks/276.js",
+        "server/app/api/tencent/route.js"
+      ],
+      "name": "app/api/tencent/route",
+      "page": "/api/tencent/route",
+      "matchers": [
+        {
+          "regexp": "^/api/tencent$",
+          "originalSource": "/api/tencent"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "regions": [
+        "arn1",
+        "bom1",
+        "cdg1",
+        "cle1",
+        "cpt1",
+        "dub1",
+        "fra1",
+        "gru1",
+        "hnd1",
+        "iad1",
+        "icn1",
+        "kix1",
+        "lhr1",
+        "pdx1",
+        "sfo1",
+        "sin1",
+        "syd1"
+      ]
+    },
     "/api/webdav/[...path]/route": {
       "files": [
         "server/middleware-build-manifest.js",
@@ -292,90 +172,6 @@
       ],
       "wasm": [],
       "assets": []
-    },
-    "/api/azure/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "prerender-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/edge-chunks/297.js",
-        "server/edge-chunks/45.js",
-        "server/edge-chunks/744.js",
-        "server/app/api/azure/[...path]/route.js"
-      ],
-      "name": "app/api/azure/[...path]/route",
-      "page": "/api/azure/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/azure/(?<path>.+?)$",
-          "originalSource": "/api/azure/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": [],
-      "regions": [
-        "arn1",
-        "bom1",
-        "cdg1",
-        "cle1",
-        "cpt1",
-        "dub1",
-        "fra1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "lhr1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
-    },
-    "/api/anthropic/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "prerender-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/edge-chunks/297.js",
-        "server/edge-chunks/45.js",
-        "server/edge-chunks/744.js",
-        "server/app/api/anthropic/[...path]/route.js"
-      ],
-      "name": "app/api/anthropic/[...path]/route",
-      "page": "/api/anthropic/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/anthropic/(?<path>.+?)$",
-          "originalSource": "/api/anthropic/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": [],
-      "regions": [
-        "arn1",
-        "bom1",
-        "cdg1",
-        "cle1",
-        "cpt1",
-        "dub1",
-        "fra1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "lhr1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
     }
   },
   "version": 2
