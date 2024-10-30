@@ -53,6 +53,7 @@ const getServerSideConfig = ()=>{
     const isAlibaba = !!process.env.ALIBABA_API_KEY;
     const isMoonshot = !!process.env.MOONSHOT_API_KEY;
     const isIflytek = !!process.env.IFLYTEK_API_KEY;
+    const isXAI = !!process.env.XAI_API_KEY;
     // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
     // const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
     // const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -100,6 +101,9 @@ const getServerSideConfig = ()=>{
         iflytekUrl: process.env.IFLYTEK_URL,
         iflytekApiKey: process.env.IFLYTEK_API_KEY,
         iflytekApiSecret: process.env.IFLYTEK_API_SECRET,
+        isXAI,
+        xaiUrl: process.env.XAI_URL,
+        xaiApiKey: getApiKey(process.env.XAI_API_KEY),
         cloudflareAccountId: process.env.CLOUDFLARE_ACCOUNT_ID,
         cloudflareKVNamespaceId: process.env.CLOUDFLARE_KV_NAMESPACE_ID,
         cloudflareKVApiKey: getApiKey(process.env.CLOUDFLARE_KV_API_KEY),
@@ -141,6 +145,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   Uf: () => (/* binding */ STORAGE_KEY),
 /* harmony export */   YU: () => (/* binding */ Anthropic),
 /* harmony export */   bP: () => (/* binding */ MOONSHOT_BASE_URL),
+/* harmony export */   eE: () => (/* binding */ XAI_BASE_URL),
 /* harmony export */   ik: () => (/* binding */ BYTEDANCE_BASE_URL),
 /* harmony export */   k8: () => (/* binding */ ModelProvider),
 /* harmony export */   mX: () => (/* binding */ OpenaiPath),
@@ -150,7 +155,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   x5: () => (/* binding */ ALIBABA_BASE_URL),
 /* harmony export */   y3: () => (/* binding */ ANTHROPIC_BASE_URL)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, DEFAULT_API_HOST, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, PLUGINS */
+/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, XAI, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, PLUGINS, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
 const OWNER = "ChatGPTNextWeb";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = (/* unused pure expression or super */ null && (`https://github.com/${OWNER}/${REPO}`));
@@ -162,7 +167,6 @@ const FETCH_COMMIT_URL = (/* unused pure expression or super */ null && (`https:
 const FETCH_TAG_URL = (/* unused pure expression or super */ null && (`https://api.github.com/repos/${OWNER}/${REPO}/tags?per_page=1`));
 const RUNTIME_CONFIG_DOM = "danger-runtime-config";
 const STABILITY_BASE_URL = "https://api.stability.ai";
-const DEFAULT_API_HOST = "https://api.nextchat.dev";
 const OPENAI_BASE_URL = "https://api.openai.com";
 const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
@@ -173,6 +177,7 @@ const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
 const TENCENT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
 const MOONSHOT_BASE_URL = "https://api.moonshot.cn";
 const IFLYTEK_BASE_URL = "https://spark-api-open.xf-yun.com";
+const XAI_BASE_URL = "https://api.x.ai";
 const CACHE_URL_PREFIX = "/api/cache";
 const UPLOAD_URL = (/* unused pure expression or super */ null && (`${CACHE_URL_PREFIX}/upload`));
 var Path;
@@ -204,6 +209,7 @@ var ApiPath;
     ApiPath["Iflytek"] = "/api/iflytek";
     ApiPath["Stability"] = "/api/stability";
     ApiPath["Artifacts"] = "/api/artifacts";
+    ApiPath["XAI"] = "/api/xai";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
 (function(SlotID) {
@@ -250,6 +256,7 @@ var ServiceProvider;
     ServiceProvider["Moonshot"] = "Moonshot";
     ServiceProvider["Stability"] = "Stability";
     ServiceProvider["Iflytek"] = "Iflytek";
+    ServiceProvider["XAI"] = "XAI";
 })(ServiceProvider || (ServiceProvider = {}));
 var GoogleSafetySettingsThreshold;
 (function(GoogleSafetySettingsThreshold) {
@@ -270,6 +277,7 @@ var ModelProvider;
     ModelProvider["Hunyuan"] = "Hunyuan";
     ModelProvider["Moonshot"] = "Moonshot";
     ModelProvider["Iflytek"] = "Iflytek";
+    ModelProvider["XAI"] = "XAI";
 })(ModelProvider || (ModelProvider = {}));
 const Stability = {
     GeneratePath: "v2beta/stable-image/generate",
@@ -335,6 +343,10 @@ const Moonshot = {
 };
 const Iflytek = {
     ExampleEndpoint: IFLYTEK_BASE_URL,
+    ChatPath: "v1/chat/completions"
+};
+const XAI = {
+    ExampleEndpoint: XAI_BASE_URL,
     ChatPath: "v1/chat/completions"
 };
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
@@ -483,6 +495,9 @@ const iflytekModels = [
     "generalv3.5",
     "4.0Ultra"
 ];
+const xAIModes = [
+    "grok-beta"
+];
 let seq = 1000; // 内置的模型序号生成器从1000开始
 const DEFAULT_MODELS = [
     ...openaiModels.map((name)=>({
@@ -594,6 +609,17 @@ const DEFAULT_MODELS = [
                 providerType: "iflytek",
                 sorted: 10
             }
+        })),
+    ...xAIModes.map((name)=>({
+            name,
+            available: true,
+            sorted: seq++,
+            provider: {
+                id: "xai",
+                providerName: "XAI",
+                providerType: "xai",
+                sorted: 11
+            }
         }))
 ];
 const CHAT_PAGE_SIZE = 15;
@@ -625,6 +651,8 @@ const PLUGINS = [
         path: "/search-chat"
     }
 ];
+const SAAS_CHAT_URL = "https://nextchat.dev/chat";
+const SAAS_CHAT_UTM_URL = "https://nextchat.dev/chat?utm=github";
 
 
 /***/ })
