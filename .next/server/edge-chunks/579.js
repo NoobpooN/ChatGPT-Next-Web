@@ -40,8 +40,8 @@ const getServerSideConfig = ()=>{
     let defaultModel = process.env.DEFAULT_MODEL ?? "";
     if (disableGPT4) {
         if (customModels) customModels += ",";
-        customModels += _constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_MODELS */ .Fv.filter((m)=>(m.name.startsWith("gpt-4") || m.name.startsWith("chatgpt-4o")) && !m.name.startsWith("gpt-4o-mini")).map((m)=>"-" + m.name).join(",");
-        if ((defaultModel.startsWith("gpt-4") || defaultModel.startsWith("chatgpt-4o")) && !defaultModel.startsWith("gpt-4o-mini")) defaultModel = "";
+        customModels += _constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_MODELS */ .Fv.filter((m)=>(m.name.startsWith("gpt-4") || m.name.startsWith("chatgpt-4o") || m.name.startsWith("o1")) && !m.name.startsWith("gpt-4o-mini")).map((m)=>"-" + m.name).join(",");
+        if ((defaultModel.startsWith("gpt-4") || defaultModel.startsWith("chatgpt-4o") || defaultModel.startsWith("o1")) && !defaultModel.startsWith("gpt-4o-mini")) defaultModel = "";
     }
     const isStability = !!process.env.STABILITY_API_KEY;
     const isAzure = !!process.env.AZURE_URL;
@@ -54,6 +54,7 @@ const getServerSideConfig = ()=>{
     const isMoonshot = !!process.env.MOONSHOT_API_KEY;
     const isIflytek = !!process.env.IFLYTEK_API_KEY;
     const isXAI = !!process.env.XAI_API_KEY;
+    const isChatGLM = !!process.env.CHATGLM_API_KEY;
     // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
     // const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
     // const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -104,6 +105,9 @@ const getServerSideConfig = ()=>{
         isXAI,
         xaiUrl: process.env.XAI_URL,
         xaiApiKey: getApiKey(process.env.XAI_API_KEY),
+        isChatGLM,
+        chatglmUrl: process.env.CHATGLM_URL,
+        chatglmApiKey: getApiKey(process.env.CHATGLM_API_KEY),
         cloudflareAccountId: process.env.CLOUDFLARE_ACCOUNT_ID,
         cloudflareKVNamespaceId: process.env.CLOUDFLARE_KV_NAMESPACE_ID,
         cloudflareKVApiKey: getApiKey(process.env.CLOUDFLARE_KV_API_KEY),
@@ -132,6 +136,7 @@ const getServerSideConfig = ()=>{
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   BJ: () => (/* binding */ CHATGLM_BASE_URL),
 /* harmony export */   Bi: () => (/* binding */ OPENAI_BASE_URL),
 /* harmony export */   FR: () => (/* binding */ BAIDU_OATUH_URL),
 /* harmony export */   Fv: () => (/* binding */ DEFAULT_MODELS),
@@ -155,7 +160,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   x5: () => (/* binding */ ALIBABA_BASE_URL),
 /* harmony export */   y3: () => (/* binding */ ANTHROPIC_BASE_URL)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, XAI, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, PLUGINS, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
+/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, XAI, ChatGLM, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, PLUGINS, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
 const OWNER = "ChatGPTNextWeb";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = (/* unused pure expression or super */ null && (`https://github.com/${OWNER}/${REPO}`));
@@ -178,6 +183,7 @@ const TENCENT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
 const MOONSHOT_BASE_URL = "https://api.moonshot.cn";
 const IFLYTEK_BASE_URL = "https://spark-api-open.xf-yun.com";
 const XAI_BASE_URL = "https://api.x.ai";
+const CHATGLM_BASE_URL = "https://open.bigmodel.cn";
 const CACHE_URL_PREFIX = "/api/cache";
 const UPLOAD_URL = (/* unused pure expression or super */ null && (`${CACHE_URL_PREFIX}/upload`));
 var Path;
@@ -210,6 +216,7 @@ var ApiPath;
     ApiPath["Stability"] = "/api/stability";
     ApiPath["Artifacts"] = "/api/artifacts";
     ApiPath["XAI"] = "/api/xai";
+    ApiPath["ChatGLM"] = "/api/chatglm";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
 (function(SlotID) {
@@ -257,6 +264,7 @@ var ServiceProvider;
     ServiceProvider["Stability"] = "Stability";
     ServiceProvider["Iflytek"] = "Iflytek";
     ServiceProvider["XAI"] = "XAI";
+    ServiceProvider["ChatGLM"] = "ChatGLM";
 })(ServiceProvider || (ServiceProvider = {}));
 var GoogleSafetySettingsThreshold;
 (function(GoogleSafetySettingsThreshold) {
@@ -278,6 +286,7 @@ var ModelProvider;
     ModelProvider["Moonshot"] = "Moonshot";
     ModelProvider["Iflytek"] = "Iflytek";
     ModelProvider["XAI"] = "XAI";
+    ModelProvider["ChatGLM"] = "ChatGLM";
 })(ModelProvider || (ModelProvider = {}));
 const Stability = {
     GeneratePath: "v2beta/stable-image/generate",
@@ -349,6 +358,10 @@ const XAI = {
     ExampleEndpoint: XAI_BASE_URL,
     ChatPath: "v1/chat/completions"
 };
+const ChatGLM = {
+    ExampleEndpoint: CHATGLM_BASE_URL,
+    ChatPath: "api/paas/v4/chat/completions"
+};
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
 // export const DEFAULT_SYSTEM_TEMPLATE = `
 // You are ChatGPT, a large language model trained by {{ServiceProvider}}.
@@ -376,6 +389,7 @@ const KnowledgeCutOffDate = {
     "gpt-4o": "2023-10",
     "gpt-4o-2024-05-13": "2023-10",
     "gpt-4o-2024-08-06": "2023-10",
+    "gpt-4o-2024-11-20": "2023-10",
     "chatgpt-4o-latest": "2023-10",
     "gpt-4o-mini": "2023-10",
     "gpt-4o-mini-2024-07-18": "2023-10",
@@ -419,6 +433,7 @@ const openaiModels = [
     "gpt-4o",
     "gpt-4o-2024-05-13",
     "gpt-4o-2024-08-06",
+    "gpt-4o-2024-11-20",
     "chatgpt-4o-latest",
     "gpt-4o-mini",
     "gpt-4o-mini-2024-07-18",
@@ -433,6 +448,9 @@ const googleModels = [
     "gemini-1.0-pro",
     "gemini-1.5-pro-latest",
     "gemini-1.5-flash-latest",
+    "gemini-exp-1114",
+    "gemini-exp-1121",
+    "learnlm-1.5-pro-experimental",
     "gemini-pro-vision"
 ];
 const anthropicModels = [
@@ -441,11 +459,13 @@ const anthropicModels = [
     "claude-2.1",
     "claude-3-sonnet-20240229",
     "claude-3-opus-20240229",
+    "claude-3-opus-latest",
     "claude-3-haiku-20240307",
+    "claude-3-5-haiku-20241022",
+    "claude-3-5-haiku-latest",
     "claude-3-5-sonnet-20240620",
     "claude-3-5-sonnet-20241022",
-    "claude-3-5-sonnet-latest",
-    "claude-3-opus-latest"
+    "claude-3-5-sonnet-latest"
 ];
 const baiduModels = [
     "ernie-4.0-turbo-8k",
@@ -500,6 +520,16 @@ const iflytekModels = [
 ];
 const xAIModes = [
     "grok-beta"
+];
+const chatglmModels = [
+    "glm-4-plus",
+    "glm-4-0520",
+    "glm-4",
+    "glm-4-air",
+    "glm-4-airx",
+    "glm-4-long",
+    "glm-4-flashx",
+    "glm-4-flash"
 ];
 let seq = 1000; // 内置的模型序号生成器从1000开始
 const DEFAULT_MODELS = [
@@ -622,6 +652,17 @@ const DEFAULT_MODELS = [
                 providerName: "XAI",
                 providerType: "xai",
                 sorted: 11
+            }
+        })),
+    ...chatglmModels.map((name)=>({
+            name,
+            available: true,
+            sorted: seq++,
+            provider: {
+                id: "chatglm",
+                providerName: "ChatGLM",
+                providerType: "chatglm",
+                sorted: 12
             }
         }))
 ];
