@@ -86,29 +86,6 @@
         "syd1"
       ]
     },
-    "/api/webdav/[...path]/route": {
-      "files": [
-        "server/middleware-build-manifest.js",
-        "server/middleware-react-loadable-manifest.js",
-        "server/next-font-manifest.js",
-        "prerender-manifest.js",
-        "server/edge-runtime-webpack.js",
-        "server/edge-chunks/297.js",
-        "server/edge-chunks/45.js",
-        "server/edge-chunks/579.js",
-        "server/app/api/webdav/[...path]/route.js"
-      ],
-      "name": "app/api/webdav/[...path]/route",
-      "page": "/api/webdav/[...path]/route",
-      "matchers": [
-        {
-          "regexp": "^/api/webdav/(?<path>.+?)$",
-          "originalSource": "/api/webdav/[...path]"
-        }
-      ],
-      "wasm": [],
-      "assets": []
-    },
     "/api/upstash/[action]/[...key]/route": {
       "files": [
         "server/middleware-build-manifest.js",
@@ -148,6 +125,29 @@
         {
           "regexp": "^/api/artifacts$",
           "originalSource": "/api/artifacts"
+        }
+      ],
+      "wasm": [],
+      "assets": []
+    },
+    "/api/webdav/[...path]/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "prerender-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/edge-chunks/297.js",
+        "server/edge-chunks/45.js",
+        "server/edge-chunks/579.js",
+        "server/app/api/webdav/[...path]/route.js"
+      ],
+      "name": "app/api/webdav/[...path]/route",
+      "page": "/api/webdav/[...path]/route",
+      "matchers": [
+        {
+          "regexp": "^/api/webdav/(?<path>.+?)$",
+          "originalSource": "/api/webdav/[...path]"
         }
       ],
       "wasm": [],

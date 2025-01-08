@@ -3,8 +3,8 @@
   "/page": "app/page.js",
   "/api/tencent/route": "app/api/tencent/route.js",
   "/api/[provider]/[...path]/route": "app/api/[provider]/[...path]/route.js",
-  "/api/webdav/[...path]/route": "app/api/webdav/[...path]/route.js",
   "/api/upstash/[action]/[...key]/route": "app/api/upstash/[action]/[...key]/route.js",
   "/api/artifacts/route": "app/api/artifacts/route.js",
+  "/api/webdav/[...path]/route": "app/api/webdav/[...path]/route.js",
   "/api/config/route": "app/api/config/route.js"
 }

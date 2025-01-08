@@ -10,6 +10,8 @@
 /* harmony import */ var spark_md5__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5045);
 /* harmony import */ var spark_md5__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(spark_md5__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7736);
+/* harmony import */ var _utils_model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(413);
+
 
 
 const ACCESS_CODES = function getAccessCodes() {
@@ -38,10 +40,13 @@ const getServerSideConfig = ()=>{
     const disableGPT4 = !!process.env.DISABLE_GPT4;
     let customModels = process.env.CUSTOM_MODELS ?? "";
     let defaultModel = process.env.DEFAULT_MODEL ?? "";
+    let visionModels = process.env.VISION_MODELS ?? "";
     if (disableGPT4) {
         if (customModels) customModels += ",";
-        customModels += _constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_MODELS */ .Fv.filter((m)=>(m.name.startsWith("gpt-4") || m.name.startsWith("chatgpt-4o") || m.name.startsWith("o1")) && !m.name.startsWith("gpt-4o-mini")).map((m)=>"-" + m.name).join(",");
-        if ((defaultModel.startsWith("gpt-4") || defaultModel.startsWith("chatgpt-4o") || defaultModel.startsWith("o1")) && !defaultModel.startsWith("gpt-4o-mini")) defaultModel = "";
+        customModels += _constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_MODELS */ .Fv.filter((m)=>(0,_utils_model__WEBPACK_IMPORTED_MODULE_2__/* .isGPT4Model */ .vi)(m.name)).map((m)=>"-" + m.name).join(",");
+        if (defaultModel && (0,_utils_model__WEBPACK_IMPORTED_MODULE_2__/* .isGPT4Model */ .vi)(defaultModel)) {
+            defaultModel = "";
+        }
     }
     const isStability = !!process.env.STABILITY_API_KEY;
     const isAzure = !!process.env.AZURE_URL;
@@ -53,6 +58,7 @@ const getServerSideConfig = ()=>{
     const isAlibaba = !!process.env.ALIBABA_API_KEY;
     const isMoonshot = !!process.env.MOONSHOT_API_KEY;
     const isIflytek = !!process.env.IFLYTEK_API_KEY;
+    const isDeepSeek = !!process.env.DEEPSEEK_API_KEY;
     const isXAI = !!process.env.XAI_API_KEY;
     const isChatGLM = !!process.env.CHATGLM_API_KEY;
     // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
@@ -102,6 +108,9 @@ const getServerSideConfig = ()=>{
         iflytekUrl: process.env.IFLYTEK_URL,
         iflytekApiKey: process.env.IFLYTEK_API_KEY,
         iflytekApiSecret: process.env.IFLYTEK_API_SECRET,
+        isDeepSeek,
+        deepseekUrl: process.env.DEEPSEEK_URL,
+        deepseekApiKey: getApiKey(process.env.DEEPSEEK_API_KEY),
         isXAI,
         xaiUrl: process.env.XAI_URL,
         xaiApiKey: getApiKey(process.env.XAI_API_KEY),
@@ -125,6 +134,7 @@ const getServerSideConfig = ()=>{
         disableFastLink: !!process.env.DISABLE_FAST_LINK,
         customModels,
         defaultModel,
+        visionModels,
         allowedWebDavEndpoints
     };
 };
@@ -149,6 +159,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   UT: () => (/* binding */ ServiceProvider),
 /* harmony export */   Uf: () => (/* binding */ STORAGE_KEY),
 /* harmony export */   YU: () => (/* binding */ Anthropic),
+/* harmony export */   Z_: () => (/* binding */ DEEPSEEK_BASE_URL),
 /* harmony export */   bP: () => (/* binding */ MOONSHOT_BASE_URL),
 /* harmony export */   eE: () => (/* binding */ XAI_BASE_URL),
 /* harmony export */   ik: () => (/* binding */ BYTEDANCE_BASE_URL),
@@ -160,7 +171,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   x5: () => (/* binding */ ALIBABA_BASE_URL),
 /* harmony export */   y3: () => (/* binding */ ANTHROPIC_BASE_URL)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, XAI, ChatGLM, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, PLUGINS, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
+/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, DeepSeek, XAI, ChatGLM, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, VISION_MODEL_REGEXES, EXCLUDE_VISION_MODEL_REGEXES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
 const OWNER = "ChatGPTNextWeb";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = (/* unused pure expression or super */ null && (`https://github.com/${OWNER}/${REPO}`));
@@ -182,6 +193,7 @@ const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
 const TENCENT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
 const MOONSHOT_BASE_URL = "https://api.moonshot.cn";
 const IFLYTEK_BASE_URL = "https://spark-api-open.xf-yun.com";
+const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 const XAI_BASE_URL = "https://api.x.ai";
 const CHATGLM_BASE_URL = "https://open.bigmodel.cn";
 const CACHE_URL_PREFIX = "/api/cache";
@@ -217,6 +229,7 @@ var ApiPath;
     ApiPath["Artifacts"] = "/api/artifacts";
     ApiPath["XAI"] = "/api/xai";
     ApiPath["ChatGLM"] = "/api/chatglm";
+    ApiPath["DeepSeek"] = "/api/deepseek";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
 (function(SlotID) {
@@ -265,6 +278,7 @@ var ServiceProvider;
     ServiceProvider["Iflytek"] = "Iflytek";
     ServiceProvider["XAI"] = "XAI";
     ServiceProvider["ChatGLM"] = "ChatGLM";
+    ServiceProvider["DeepSeek"] = "DeepSeek";
 })(ServiceProvider || (ServiceProvider = {}));
 var GoogleSafetySettingsThreshold;
 (function(GoogleSafetySettingsThreshold) {
@@ -287,6 +301,7 @@ var ModelProvider;
     ModelProvider["Iflytek"] = "Iflytek";
     ModelProvider["XAI"] = "XAI";
     ModelProvider["ChatGLM"] = "ChatGLM";
+    ModelProvider["DeepSeek"] = "DeepSeek";
 })(ModelProvider || (ModelProvider = {}));
 const Stability = {
     GeneratePath: "v2beta/stable-image/generate",
@@ -354,13 +369,19 @@ const Iflytek = {
     ExampleEndpoint: IFLYTEK_BASE_URL,
     ChatPath: "v1/chat/completions"
 };
+const DeepSeek = {
+    ExampleEndpoint: DEEPSEEK_BASE_URL,
+    ChatPath: "chat/completions"
+};
 const XAI = {
     ExampleEndpoint: XAI_BASE_URL,
     ChatPath: "v1/chat/completions"
 };
 const ChatGLM = {
     ExampleEndpoint: CHATGLM_BASE_URL,
-    ChatPath: "api/paas/v4/chat/completions"
+    ChatPath: "api/paas/v4/chat/completions",
+    ImagePath: "api/paas/v4/images/generations",
+    VideoPath: "api/paas/v4/videos/generations"
 };
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
 // export const DEFAULT_SYSTEM_TEMPLATE = `
@@ -399,7 +420,9 @@ const KnowledgeCutOffDate = {
     // After improvements,
     // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
     "gemini-pro": "2023-12",
-    "gemini-pro-vision": "2023-12"
+    "gemini-pro-vision": "2023-12",
+    "deepseek-chat": "2024-07",
+    "deepseek-coder": "2024-07"
 };
 const DEFAULT_TTS_ENGINE = "OpenAI-TTS";
 const DEFAULT_TTS_ENGINES = (/* unused pure expression or super */ null && ([
@@ -419,6 +442,23 @@ const DEFAULT_TTS_VOICES = (/* unused pure expression or super */ null && ([
     "onyx",
     "nova",
     "shimmer"
+]));
+const VISION_MODEL_REGEXES = (/* unused pure expression or super */ null && ([
+    /vision/,
+    /gpt-4o/,
+    /claude-3/,
+    /gemini-1\.5/,
+    /gemini-exp/,
+    /gemini-2\.0/,
+    /learnlm/,
+    /qwen-vl/,
+    /qwen2-vl/,
+    /gpt-4-turbo(?!.*preview)/,
+    /^dall-e-3$/,
+    /glm-4v/
+]));
+const EXCLUDE_VISION_MODEL_REGEXES = (/* unused pure expression or super */ null && ([
+    /claude-3-5-haiku-20241022/
 ]));
 const openaiModels = [
     "gpt-3.5-turbo",
@@ -447,11 +487,21 @@ const openaiModels = [
 const googleModels = [
     "gemini-1.0-pro",
     "gemini-1.5-pro-latest",
+    "gemini-1.5-pro",
+    "gemini-1.5-pro-002",
+    "gemini-1.5-pro-exp-0827",
     "gemini-1.5-flash-latest",
+    "gemini-1.5-flash-8b-latest",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+    "gemini-1.5-flash-002",
+    "gemini-1.5-flash-exp-0827",
+    "learnlm-1.5-pro-experimental",
     "gemini-exp-1114",
     "gemini-exp-1121",
-    "learnlm-1.5-pro-experimental",
-    "gemini-pro-vision"
+    "gemini-exp-1206",
+    "gemini-2.0-flash-exp",
+    "gemini-2.0-flash-thinking-exp-1219"
 ];
 const anthropicModels = [
     "claude-instant-1.2",
@@ -518,6 +568,10 @@ const iflytekModels = [
     "generalv3.5",
     "4.0Ultra"
 ];
+const deepseekModels = [
+    "deepseek-chat",
+    "deepseek-coder"
+];
 const xAIModes = [
     "grok-beta"
 ];
@@ -529,7 +583,13 @@ const chatglmModels = [
     "glm-4-airx",
     "glm-4-long",
     "glm-4-flashx",
-    "glm-4-flash"
+    "glm-4-flash",
+    "glm-4v-plus",
+    "glm-4v",
+    "glm-4v-flash",
+    "cogview-3-plus",
+    "cogview-3",
+    "cogview-3-flash"
 ];
 let seq = 1000; // 内置的模型序号生成器从1000开始
 const DEFAULT_MODELS = [
@@ -664,6 +724,17 @@ const DEFAULT_MODELS = [
                 providerType: "chatglm",
                 sorted: 12
             }
+        })),
+    ...deepseekModels.map((name)=>({
+            name,
+            available: true,
+            sorted: seq++,
+            provider: {
+                id: "deepseek",
+                providerName: "DeepSeek",
+                providerType: "deepseek",
+                sorted: 13
+            }
         }))
 ];
 const CHAT_PAGE_SIZE = 15;
@@ -681,22 +752,197 @@ const internalAllowedWebDavEndpoints = [
     "https://app.koofr.net/dav/Koofr"
 ];
 const DEFAULT_GA_ID = "G-89WN60ZK2E";
-const PLUGINS = [
-    {
-        name: "Plugins",
-        path: "/plugins"
-    },
-    {
-        name: "Stable Diffusion",
-        path: "/sd"
-    },
-    {
-        name: "Search Chat",
-        path: "/search-chat"
-    }
-];
 const SAAS_CHAT_URL = "https://nextchat.dev/chat";
 const SAAS_CHAT_UTM_URL = "https://nextchat.dev/chat?utm=github";
+
+
+/***/ }),
+
+/***/ 413:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   En: () => (/* binding */ getModelProvider),
+/* harmony export */   f8: () => (/* binding */ isModelNotavailableInServer),
+/* harmony export */   vi: () => (/* binding */ isGPT4Model)
+/* harmony export */ });
+/* unused harmony exports collectModelTable, collectModelTableWithDefaultModel, collectModels, collectModelsWithDefaultModel, isModelAvailableInServer */
+/* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7736);
+
+const CustomSeq = {
+    val: -1000,
+    cache: new Map(),
+    next: (id)=>{
+        if (CustomSeq.cache.has(id)) {
+            return CustomSeq.cache.get(id);
+        } else {
+            let seq = CustomSeq.val++;
+            CustomSeq.cache.set(id, seq);
+            return seq;
+        }
+    }
+};
+const customProvider = (providerName)=>({
+        id: providerName.toLowerCase(),
+        providerName: providerName,
+        providerType: "custom",
+        sorted: CustomSeq.next(providerName)
+    });
+/**
+ * Sorts an array of models based on specified rules.
+ *
+ * First, sorted by provider; if the same, sorted by model
+ */ const sortModelTable = (models)=>models.sort((a, b)=>{
+        if (a.provider && b.provider) {
+            let cmp = a.provider.sorted - b.provider.sorted;
+            return cmp === 0 ? a.sorted - b.sorted : cmp;
+        } else {
+            return a.sorted - b.sorted;
+        }
+    });
+/**
+ * get model name and provider from a formatted string,
+ * e.g. `gpt-4@OpenAi` or `claude-3-5-sonnet@20240620@Google`
+ * @param modelWithProvider model name with provider separated by last `@` char,
+ * @returns [model, provider] tuple, if no `@` char found, provider is undefined
+ */ function getModelProvider(modelWithProvider) {
+    const [model, provider] = modelWithProvider.split(/@(?!.*@)/);
+    return [
+        model,
+        provider
+    ];
+}
+function collectModelTable(models, customModels) {
+    const modelTable = {};
+    // default models
+    models.forEach((m)=>{
+        // using <modelName>@<providerId> as fullName
+        modelTable[`${m.name}@${m?.provider?.id}`] = {
+            ...m,
+            displayName: m.name
+        };
+    });
+    // server custom models
+    customModels.split(",").filter((v)=>!!v && v.length > 0).forEach((m)=>{
+        const available = !m.startsWith("-");
+        const nameConfig = m.startsWith("+") || m.startsWith("-") ? m.slice(1) : m;
+        let [name, displayName] = nameConfig.split("=");
+        // enable or disable all models
+        if (name === "all") {
+            Object.values(modelTable).forEach((model)=>model.available = available);
+        } else {
+            // 1. find model by name, and set available value
+            const [customModelName, customProviderName] = getModelProvider(name);
+            let count = 0;
+            for(const fullName in modelTable){
+                const [modelName, providerName] = getModelProvider(fullName);
+                if (customModelName == modelName && (customProviderName === undefined || customProviderName === providerName)) {
+                    count += 1;
+                    modelTable[fullName]["available"] = available;
+                    // swap name and displayName for bytedance
+                    if (providerName === "bytedance") {
+                        [name, displayName] = [
+                            displayName,
+                            modelName
+                        ];
+                        modelTable[fullName]["name"] = name;
+                    }
+                    if (displayName) {
+                        modelTable[fullName]["displayName"] = displayName;
+                    }
+                }
+            }
+            // 2. if model not exists, create new model with available value
+            if (count === 0) {
+                let [customModelName, customProviderName] = getModelProvider(name);
+                const provider = customProvider(customProviderName || customModelName);
+                // swap name and displayName for bytedance
+                if (displayName && provider.providerName == "ByteDance") {
+                    [customModelName, displayName] = [
+                        displayName,
+                        customModelName
+                    ];
+                }
+                modelTable[`${customModelName}@${provider?.id}`] = {
+                    name: customModelName,
+                    displayName: displayName || customModelName,
+                    available,
+                    provider,
+                    sorted: CustomSeq.next(`${customModelName}@${provider?.id}`)
+                };
+            }
+        }
+    });
+    return modelTable;
+}
+function collectModelTableWithDefaultModel(models, customModels, defaultModel) {
+    let modelTable = collectModelTable(models, customModels);
+    if (defaultModel && defaultModel !== "") {
+        if (defaultModel.includes("@")) {
+            if (defaultModel in modelTable) {
+                modelTable[defaultModel].isDefault = true;
+            }
+        } else {
+            for (const key of Object.keys(modelTable)){
+                if (modelTable[key].available && getModelProvider(key)[0] == defaultModel) {
+                    modelTable[key].isDefault = true;
+                    break;
+                }
+            }
+        }
+    }
+    return modelTable;
+}
+/**
+ * Generate full model table.
+ */ function collectModels(models, customModels) {
+    const modelTable = collectModelTable(models, customModels);
+    let allModels = Object.values(modelTable);
+    allModels = sortModelTable(allModels);
+    return allModels;
+}
+function collectModelsWithDefaultModel(models, customModels, defaultModel) {
+    const modelTable = collectModelTableWithDefaultModel(models, customModels, defaultModel);
+    let allModels = Object.values(modelTable);
+    allModels = sortModelTable(allModels);
+    return allModels;
+}
+function isModelAvailableInServer(customModels, modelName, providerName) {
+    const fullName = `${modelName}@${providerName}`;
+    const modelTable = collectModelTable(DEFAULT_MODELS, customModels);
+    return modelTable[fullName]?.available === false;
+}
+/**
+ * Check if the model name is a GPT-4 related model
+ *
+ * @param modelName The name of the model to check
+ * @returns True if the model is a GPT-4 related model (excluding gpt-4o-mini)
+ */ function isGPT4Model(modelName) {
+    return (modelName.startsWith("gpt-4") || modelName.startsWith("chatgpt-4o") || modelName.startsWith("o1")) && !modelName.startsWith("gpt-4o-mini");
+}
+/**
+ * Checks if a model is not available on any of the specified providers in the server.
+ *
+ * @param {string} customModels - A string of custom models, comma-separated.
+ * @param {string} modelName - The name of the model to check.
+ * @param {string|string[]} providerNames - A string or array of provider names to check against.
+ *
+ * @returns {boolean} True if the model is not available on any of the specified providers, false otherwise.
+ */ function isModelNotavailableInServer(customModels, modelName, providerNames) {
+    // Check DISABLE_GPT4 environment variable
+    if (process.env.DISABLE_GPT4 === "1" && isGPT4Model(modelName.toLowerCase())) {
+        return true;
+    }
+    const modelTable = collectModelTable(_constant__WEBPACK_IMPORTED_MODULE_0__/* .DEFAULT_MODELS */ .Fv, customModels);
+    const providerNamesArray = Array.isArray(providerNames) ? providerNames : [
+        providerNames
+    ];
+    for (const providerName of providerNamesArray){
+        const fullName = `${modelName}@${providerName.toLowerCase()}`;
+        if (modelTable?.[fullName]?.available === true) return false;
+    }
+    return true;
+}
 
 
 /***/ })
