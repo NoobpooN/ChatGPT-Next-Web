@@ -2,7 +2,7 @@
   "sortedMiddleware": [],
   "middleware": {},
   "functions": {
-    "/api/tencent/route": {
+    "/api/config/route": {
       "files": [
         "server/middleware-build-manifest.js",
         "server/middleware-react-loadable-manifest.js",
@@ -12,37 +12,18 @@
         "server/edge-chunks/297.js",
         "server/edge-chunks/45.js",
         "server/edge-chunks/579.js",
-        "server/app/api/tencent/route.js"
+        "server/app/api/config/route.js"
       ],
-      "name": "app/api/tencent/route",
-      "page": "/api/tencent/route",
+      "name": "app/api/config/route",
+      "page": "/api/config/route",
       "matchers": [
         {
-          "regexp": "^/api/tencent$",
-          "originalSource": "/api/tencent"
+          "regexp": "^/api/config$",
+          "originalSource": "/api/config"
         }
       ],
       "wasm": [],
-      "assets": [],
-      "regions": [
-        "arn1",
-        "bom1",
-        "cdg1",
-        "cle1",
-        "cpt1",
-        "dub1",
-        "fra1",
-        "gru1",
-        "hnd1",
-        "iad1",
-        "icn1",
-        "kix1",
-        "lhr1",
-        "pdx1",
-        "sfo1",
-        "sin1",
-        "syd1"
-      ]
+      "assets": []
     },
     "/api/[provider]/[...path]/route": {
       "files": [
@@ -107,7 +88,7 @@
       "wasm": [],
       "assets": []
     },
-    "/api/artifacts/route": {
+    "/api/tencent/route": {
       "files": [
         "server/middleware-build-manifest.js",
         "server/middleware-react-loadable-manifest.js",
@@ -117,18 +98,37 @@
         "server/edge-chunks/297.js",
         "server/edge-chunks/45.js",
         "server/edge-chunks/579.js",
-        "server/app/api/artifacts/route.js"
+        "server/app/api/tencent/route.js"
       ],
-      "name": "app/api/artifacts/route",
-      "page": "/api/artifacts/route",
+      "name": "app/api/tencent/route",
+      "page": "/api/tencent/route",
       "matchers": [
         {
-          "regexp": "^/api/artifacts$",
-          "originalSource": "/api/artifacts"
+          "regexp": "^/api/tencent$",
+          "originalSource": "/api/tencent"
         }
       ],
       "wasm": [],
-      "assets": []
+      "assets": [],
+      "regions": [
+        "arn1",
+        "bom1",
+        "cdg1",
+        "cle1",
+        "cpt1",
+        "dub1",
+        "fra1",
+        "gru1",
+        "hnd1",
+        "iad1",
+        "icn1",
+        "kix1",
+        "lhr1",
+        "pdx1",
+        "sfo1",
+        "sin1",
+        "syd1"
+      ]
     },
     "/api/webdav/[...path]/route": {
       "files": [
@@ -153,7 +153,7 @@
       "wasm": [],
       "assets": []
     },
-    "/api/config/route": {
+    "/api/artifacts/route": {
       "files": [
         "server/middleware-build-manifest.js",
         "server/middleware-react-loadable-manifest.js",
@@ -163,14 +163,14 @@
         "server/edge-chunks/297.js",
         "server/edge-chunks/45.js",
         "server/edge-chunks/579.js",
-        "server/app/api/config/route.js"
+        "server/app/api/artifacts/route.js"
       ],
-      "name": "app/api/config/route",
-      "page": "/api/config/route",
+      "name": "app/api/artifacts/route",
+      "page": "/api/artifacts/route",
       "matchers": [
         {
-          "regexp": "^/api/config$",
-          "originalSource": "/api/config"
+          "regexp": "^/api/artifacts$",
+          "originalSource": "/api/artifacts"
         }
       ],
       "wasm": [],

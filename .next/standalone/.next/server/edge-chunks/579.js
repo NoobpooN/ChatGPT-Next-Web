@@ -61,6 +61,7 @@ const getServerSideConfig = ()=>{
     const isDeepSeek = !!process.env.DEEPSEEK_API_KEY;
     const isXAI = !!process.env.XAI_API_KEY;
     const isChatGLM = !!process.env.CHATGLM_API_KEY;
+    const isSiliconFlow = !!process.env.SILICONFLOW_API_KEY;
     // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
     // const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
     // const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -121,6 +122,9 @@ const getServerSideConfig = ()=>{
         cloudflareKVNamespaceId: process.env.CLOUDFLARE_KV_NAMESPACE_ID,
         cloudflareKVApiKey: getApiKey(process.env.CLOUDFLARE_KV_API_KEY),
         cloudflareKVTTL: process.env.CLOUDFLARE_KV_TTL,
+        isSiliconFlow,
+        siliconFlowUrl: process.env.SILICONFLOW_URL,
+        siliconFlowApiKey: getApiKey(process.env.SILICONFLOW_API_KEY),
         gtmId: process.env.GTM_ID,
         gaId: process.env.GA_ID || _constant__WEBPACK_IMPORTED_MODULE_1__/* .DEFAULT_GA_ID */ .Mq,
         needCode: ACCESS_CODES.size > 0,
@@ -135,7 +139,8 @@ const getServerSideConfig = ()=>{
         customModels,
         defaultModel,
         visionModels,
-        allowedWebDavEndpoints
+        allowedWebDavEndpoints,
+        enableMcp: process.env.ENABLE_MCP === "true"
     };
 };
 
@@ -163,6 +168,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   bP: () => (/* binding */ MOONSHOT_BASE_URL),
 /* harmony export */   eE: () => (/* binding */ XAI_BASE_URL),
 /* harmony export */   ik: () => (/* binding */ BYTEDANCE_BASE_URL),
+/* harmony export */   jT: () => (/* binding */ SILICONFLOW_BASE_URL),
 /* harmony export */   k8: () => (/* binding */ ModelProvider),
 /* harmony export */   mX: () => (/* binding */ OpenaiPath),
 /* harmony export */   n9: () => (/* binding */ BAIDU_BASE_URL),
@@ -171,7 +177,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   x5: () => (/* binding */ ALIBABA_BASE_URL),
 /* harmony export */   y3: () => (/* binding */ ANTHROPIC_BASE_URL)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, DeepSeek, XAI, ChatGLM, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, VISION_MODEL_REGEXES, EXCLUDE_VISION_MODEL_REGEXES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
+/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, DeepSeek, XAI, ChatGLM, SiliconFlow, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, MCP_TOOLS_TEMPLATE, MCP_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, DEEPSEEK_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, VISION_MODEL_REGEXES, EXCLUDE_VISION_MODEL_REGEXES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
 const OWNER = "ChatGPTNextWeb";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = (/* unused pure expression or super */ null && (`https://github.com/${OWNER}/${REPO}`));
@@ -196,6 +202,7 @@ const IFLYTEK_BASE_URL = "https://spark-api-open.xf-yun.com";
 const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 const XAI_BASE_URL = "https://api.x.ai";
 const CHATGLM_BASE_URL = "https://open.bigmodel.cn";
+const SILICONFLOW_BASE_URL = "https://api.siliconflow.cn";
 const CACHE_URL_PREFIX = "/api/cache";
 const UPLOAD_URL = (/* unused pure expression or super */ null && (`${CACHE_URL_PREFIX}/upload`));
 var Path;
@@ -211,6 +218,7 @@ var Path;
     Path["SdNew"] = "/sd-new";
     Path["Artifacts"] = "/artifacts";
     Path["SearchChat"] = "/search-chat";
+    Path["McpMarket"] = "/mcp-market";
 })(Path || (Path = {}));
 var ApiPath;
 (function(ApiPath) {
@@ -230,6 +238,7 @@ var ApiPath;
     ApiPath["XAI"] = "/api/xai";
     ApiPath["ChatGLM"] = "/api/chatglm";
     ApiPath["DeepSeek"] = "/api/deepseek";
+    ApiPath["SiliconFlow"] = "/api/siliconflow";
 })(ApiPath || (ApiPath = {}));
 var SlotID;
 (function(SlotID) {
@@ -252,6 +261,7 @@ var StoreKey;
     StoreKey["Update"] = "chat-update";
     StoreKey["Sync"] = "sync";
     StoreKey["SdList"] = "sd-list";
+    StoreKey["Mcp"] = "mcp-store";
 })(StoreKey || (StoreKey = {}));
 const DEFAULT_SIDEBAR_WIDTH = 300;
 const MAX_SIDEBAR_WIDTH = 500;
@@ -279,6 +289,7 @@ var ServiceProvider;
     ServiceProvider["XAI"] = "XAI";
     ServiceProvider["ChatGLM"] = "ChatGLM";
     ServiceProvider["DeepSeek"] = "DeepSeek";
+    ServiceProvider["SiliconFlow"] = "SiliconFlow";
 })(ServiceProvider || (ServiceProvider = {}));
 var GoogleSafetySettingsThreshold;
 (function(GoogleSafetySettingsThreshold) {
@@ -302,6 +313,7 @@ var ModelProvider;
     ModelProvider["XAI"] = "XAI";
     ModelProvider["ChatGLM"] = "ChatGLM";
     ModelProvider["DeepSeek"] = "DeepSeek";
+    ModelProvider["SiliconFlow"] = "SiliconFlow";
 })(ModelProvider || (ModelProvider = {}));
 const Stability = {
     GeneratePath: "v2beta/stable-image/generate",
@@ -383,6 +395,10 @@ const ChatGLM = {
     ImagePath: "api/paas/v4/images/generations",
     VideoPath: "api/paas/v4/videos/generations"
 };
+const SiliconFlow = {
+    ExampleEndpoint: SILICONFLOW_BASE_URL,
+    ChatPath: "v1/chat/completions"
+};
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
 // export const DEFAULT_SYSTEM_TEMPLATE = `
 // You are ChatGPT, a large language model trained by {{ServiceProvider}}.
@@ -400,8 +416,131 @@ Current time: {{time}}
 Latex inline: \\(x^2\\) 
 Latex block: $$e=mc^2$$
 `));
+const MCP_TOOLS_TEMPLATE = (/* unused pure expression or super */ null && (`
+[clientId]
+{{ clientId }}
+[tools]
+{{ tools }}
+`));
+const MCP_SYSTEM_TEMPLATE = (/* unused pure expression or super */ null && (`
+You are an AI assistant with access to system tools. Your role is to help users by combining natural language understanding with tool operations when needed.
+
+1. AVAILABLE TOOLS:
+{{ MCP_TOOLS }}
+
+2. WHEN TO USE TOOLS:
+   - ALWAYS USE TOOLS when they can help answer user questions
+   - DO NOT just describe what you could do - TAKE ACTION immediately
+   - If you're not sure whether to use a tool, USE IT
+   - Common triggers for tool use:
+     * Questions about files or directories
+     * Requests to check, list, or manipulate system resources
+     * Any query that can be answered with available tools
+
+3. HOW TO USE TOOLS:
+   A. Tool Call Format:
+      - Use markdown code blocks with format: \`\`\`json:mcp:{clientId}\`\`\`
+      - Always include:
+        * method: "tools/call"（Only this method is supported）
+        * params: 
+          - name: must match an available primitive name
+          - arguments: required parameters for the primitive
+
+   B. Response Format:
+      - Tool responses will come as user messages
+      - Format: \`\`\`json:mcp-response:{clientId}\`\`\`
+      - Wait for response before making another tool call
+
+   C. Important Rules:
+      - Only use tools/call method
+      - Only ONE tool call per message
+      - ALWAYS TAKE ACTION instead of just describing what you could do
+      - Include the correct clientId in code block language tag
+      - Verify arguments match the primitive's requirements
+
+4. INTERACTION FLOW:
+   A. When user makes a request:
+      - IMMEDIATELY use appropriate tool if available
+      - DO NOT ask if user wants you to use the tool
+      - DO NOT just describe what you could do
+   B. After receiving tool response:
+      - Explain results clearly
+      - Take next appropriate action if needed
+   C. If tools fail:
+      - Explain the error
+      - Try alternative approach immediately
+
+5. EXAMPLE INTERACTION:
+
+  good example:
+
+   \`\`\`json:mcp:filesystem
+   {
+     "method": "tools/call",
+     "params": {
+       "name": "list_allowed_directories",
+       "arguments": {}
+     }
+   }
+   \`\`\`"
+
+
+  \`\`\`json:mcp-response:filesystem
+  {
+  "method": "tools/call",
+  "params": {
+    "name": "write_file",
+    "arguments": {
+      "path": "/Users/river/dev/nextchat/test/joke.txt",
+      "content": "为什么数学书总是感到忧伤？因为它有太多的问题。"
+    }
+  }
+  }
+\`\`\`
+
+   follwing is the wrong! mcp json example:
+
+   \`\`\`json:mcp:filesystem
+   {
+      "method": "write_file",
+      "params": {
+        "path": "NextChat_Information.txt",
+        "content": "1"
+    }
+   }
+   \`\`\`
+
+   This is wrong because the method is not tools/call.
+   
+   \`\`\`{
+  "method": "search_repositories",
+  "params": {
+    "query": "2oeee"
+  }
+}
+   \`\`\`
+
+   This is wrong because the method is not tools/call.!!!!!!!!!!!
+
+   the right format is:
+   \`\`\`json:mcp:filesystem
+   {
+     "method": "tools/call",
+     "params": {
+       "name": "search_repositories",
+       "arguments": {
+         "query": "2oeee"
+       }
+     }
+   }
+   \`\`\`
+   
+   please follow the format strictly ONLY use tools/call method!!!!!!!!!!!
+   
+`));
 const SUMMARIZE_MODEL = "gpt-4o-mini";
 const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
+const DEEPSEEK_SUMMARIZE_MODEL = "deepseek-chat";
 const KnowledgeCutOffDate = {
     default: "2021-09",
     "gpt-4-turbo": "2023-12",
@@ -415,8 +554,14 @@ const KnowledgeCutOffDate = {
     "gpt-4o-mini": "2023-10",
     "gpt-4o-mini-2024-07-18": "2023-10",
     "gpt-4-vision-preview": "2023-04",
+    "o1-mini-2024-09-12": "2023-10",
     "o1-mini": "2023-10",
+    "o1-preview-2024-09-12": "2023-10",
     "o1-preview": "2023-10",
+    "o1-2024-12-17": "2023-10",
+    o1: "2023-10",
+    "o3-mini-2025-01-31": "2023-10",
+    "o3-mini": "2023-10",
     // After improvements,
     // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
     "gemini-pro": "2023-12",
@@ -461,6 +606,8 @@ const EXCLUDE_VISION_MODEL_REGEXES = (/* unused pure expression or super */ null
     /claude-3-5-haiku-20241022/
 ]));
 const openaiModels = [
+    // As of July 2024, gpt-4o-mini should be used in place of gpt-3.5-turbo,
+    // as it is cheaper, more capable, multimodal, and just as fast. gpt-3.5-turbo is still available for use in the API.
     "gpt-3.5-turbo",
     "gpt-3.5-turbo-1106",
     "gpt-3.5-turbo-0125",
@@ -482,7 +629,8 @@ const openaiModels = [
     "gpt-4-1106-preview",
     "dall-e-3",
     "o1-mini",
-    "o1-preview"
+    "o1-preview",
+    "o3-mini"
 ];
 const googleModels = [
     "gemini-1.0-pro",
@@ -501,7 +649,9 @@ const googleModels = [
     "gemini-exp-1121",
     "gemini-exp-1206",
     "gemini-2.0-flash-exp",
-    "gemini-2.0-flash-thinking-exp-1219"
+    "gemini-2.0-flash-thinking-exp",
+    "gemini-2.0-flash-thinking-exp-1219",
+    "gemini-2.0-flash-thinking-exp-01-21"
 ];
 const anthropicModels = [
     "claude-instant-1.2",
@@ -570,7 +720,8 @@ const iflytekModels = [
 ];
 const deepseekModels = [
     "deepseek-chat",
-    "deepseek-coder"
+    "deepseek-coder",
+    "deepseek-reasoner"
 ];
 const xAIModes = [
     "grok-beta"
@@ -590,6 +741,20 @@ const chatglmModels = [
     "cogview-3-plus",
     "cogview-3",
     "cogview-3-flash"
+];
+const siliconflowModels = [
+    "Qwen/Qwen2.5-7B-Instruct",
+    "Qwen/Qwen2.5-72B-Instruct",
+    "deepseek-ai/DeepSeek-R1",
+    "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+    "deepseek-ai/DeepSeek-V3",
+    "meta-llama/Llama-3.3-70B-Instruct",
+    "THUDM/glm-4-9b-chat"
 ];
 let seq = 1000; // 内置的模型序号生成器从1000开始
 const DEFAULT_MODELS = [
@@ -734,6 +899,17 @@ const DEFAULT_MODELS = [
                 providerName: "DeepSeek",
                 providerType: "deepseek",
                 sorted: 13
+            }
+        })),
+    ...siliconflowModels.map((name)=>({
+            name,
+            available: true,
+            sorted: seq++,
+            provider: {
+                id: "siliconflow",
+                providerName: "SiliconFlow",
+                providerType: "siliconflow",
+                sorted: 14
             }
         }))
 ];
@@ -938,6 +1114,10 @@ function isModelAvailableInServer(customModels, modelName, providerName) {
         providerNames
     ];
     for (const providerName of providerNamesArray){
+        // if model provider is bytedance, use model config name to check if not avaliable
+        if (providerName === _constant__WEBPACK_IMPORTED_MODULE_0__/* .ServiceProvider */ .UT.ByteDance) {
+            return !Object.values(modelTable).filter((v)=>v.name === modelName)?.[0]?.available;
+        }
         const fullName = `${modelName}@${providerName.toLowerCase()}`;
         if (modelTable?.[fullName]?.available === true) return false;
     }
