@@ -177,7 +177,7 @@ const getServerSideConfig = ()=>{
 /* harmony export */   x5: () => (/* binding */ ALIBABA_BASE_URL),
 /* harmony export */   y3: () => (/* binding */ ANTHROPIC_BASE_URL)
 /* harmony export */ });
-/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, DeepSeek, XAI, ChatGLM, SiliconFlow, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, MCP_TOOLS_TEMPLATE, MCP_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, DEEPSEEK_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, VISION_MODEL_REGEXES, EXCLUDE_VISION_MODEL_REGEXES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
+/* unused harmony exports OWNER, REPO, REPO_URL, PLUGINS_REPO_URL, ISSUE_URL, UPDATE_URL, RELEASE_URL, FETCH_COMMIT_URL, FETCH_TAG_URL, RUNTIME_CONFIG_DOM, CACHE_URL_PREFIX, UPLOAD_URL, Path, SlotID, FileName, StoreKey, DEFAULT_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH, NARROW_SIDEBAR_WIDTH, LAST_INPUT_KEY, UNFINISHED_INPUT, REQUEST_TIMEOUT_MS, REQUEST_TIMEOUT_MS_FOR_THINKING, EXPORT_MESSAGE_CLASS_NAME, GoogleSafetySettingsThreshold, Stability, Azure, Google, Baidu, ByteDance, Alibaba, Tencent, Moonshot, Iflytek, DeepSeek, XAI, ChatGLM, SiliconFlow, DEFAULT_INPUT_TEMPLATE, DEFAULT_SYSTEM_TEMPLATE, MCP_TOOLS_TEMPLATE, MCP_SYSTEM_TEMPLATE, SUMMARIZE_MODEL, GEMINI_SUMMARIZE_MODEL, DEEPSEEK_SUMMARIZE_MODEL, KnowledgeCutOffDate, DEFAULT_TTS_ENGINE, DEFAULT_TTS_ENGINES, DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE, DEFAULT_TTS_MODELS, DEFAULT_TTS_VOICES, VISION_MODEL_REGEXES, EXCLUDE_VISION_MODEL_REGEXES, CHAT_PAGE_SIZE, MAX_RENDER_MSG_COUNT, SAAS_CHAT_URL, SAAS_CHAT_UTM_URL */
 const OWNER = "ChatGPTNextWeb";
 const REPO = "ChatGPT-Next-Web";
 const REPO_URL = (/* unused pure expression or super */ null && (`https://github.com/${OWNER}/${REPO}`));
@@ -272,6 +272,7 @@ const LAST_INPUT_KEY = "last-input";
 const UNFINISHED_INPUT = (id)=>"unfinished-input-" + id;
 const STORAGE_KEY = "chatgpt-next-web";
 const REQUEST_TIMEOUT_MS = 60000;
+const REQUEST_TIMEOUT_MS_FOR_THINKING = REQUEST_TIMEOUT_MS * 5;
 const EXPORT_MESSAGE_CLASS_NAME = "export-markdown";
 var ServiceProvider;
 (function(ServiceProvider) {
@@ -368,7 +369,12 @@ const ByteDance = {
 };
 const Alibaba = {
     ExampleEndpoint: ALIBABA_BASE_URL,
-    ChatPath: "v1/services/aigc/text-generation/generation"
+    ChatPath: (modelName)=>{
+        if (modelName.includes("vl") || modelName.includes("omni")) {
+            return "v1/services/aigc/multimodal-generation/generation";
+        }
+        return `v1/services/aigc/text-generation/generation`;
+    }
 };
 const Tencent = {
     ExampleEndpoint: TENCENT_BASE_URL
@@ -397,7 +403,8 @@ const ChatGLM = {
 };
 const SiliconFlow = {
     ExampleEndpoint: SILICONFLOW_BASE_URL,
-    ChatPath: "v1/chat/completions"
+    ChatPath: "v1/chat/completions",
+    ListModelPath: "v1/models?&sub_type=chat"
 };
 const DEFAULT_INPUT_TEMPLATE = (/* unused pure expression or super */ null && (`{{input}}`)); // input / time / model / lang
 // export const DEFAULT_SYSTEM_TEMPLATE = `
@@ -600,7 +607,8 @@ const VISION_MODEL_REGEXES = (/* unused pure expression or super */ null && ([
     /qwen2-vl/,
     /gpt-4-turbo(?!.*preview)/,
     /^dall-e-3$/,
-    /glm-4v/
+    /glm-4v/,
+    /vl/i
 ]));
 const EXCLUDE_VISION_MODEL_REGEXES = (/* unused pure expression or super */ null && ([
     /claude-3-5-haiku-20241022/
@@ -648,10 +656,14 @@ const googleModels = [
     "gemini-exp-1114",
     "gemini-exp-1121",
     "gemini-exp-1206",
+    "gemini-2.0-flash",
     "gemini-2.0-flash-exp",
+    "gemini-2.0-flash-lite-preview-02-05",
     "gemini-2.0-flash-thinking-exp",
     "gemini-2.0-flash-thinking-exp-1219",
-    "gemini-2.0-flash-thinking-exp-01-21"
+    "gemini-2.0-flash-thinking-exp-01-21",
+    "gemini-2.0-pro-exp",
+    "gemini-2.0-pro-exp-02-05"
 ];
 const anthropicModels = [
     "claude-instant-1.2",
@@ -665,7 +677,9 @@ const anthropicModels = [
     "claude-3-5-haiku-latest",
     "claude-3-5-sonnet-20240620",
     "claude-3-5-sonnet-20241022",
-    "claude-3-5-sonnet-latest"
+    "claude-3-5-sonnet-latest",
+    "claude-3-7-sonnet-20250219",
+    "claude-3-7-sonnet-latest"
 ];
 const baiduModels = [
     "ernie-4.0-turbo-8k",
@@ -695,7 +709,10 @@ const alibabaModes = [
     "qwen-max-0428",
     "qwen-max-0403",
     "qwen-max-0107",
-    "qwen-max-longcontext"
+    "qwen-max-longcontext",
+    "qwen-omni-turbo",
+    "qwen-vl-plus",
+    "qwen-vl-max"
 ];
 const tencentModels = [
     "hunyuan-pro",
@@ -724,7 +741,14 @@ const deepseekModels = [
     "deepseek-reasoner"
 ];
 const xAIModes = [
-    "grok-beta"
+    "grok-beta",
+    "grok-2",
+    "grok-2-1212",
+    "grok-2-latest",
+    "grok-vision-beta",
+    "grok-2-vision-1212",
+    "grok-2-vision",
+    "grok-2-vision-latest"
 ];
 const chatglmModels = [
     "glm-4-plus",
@@ -754,7 +778,9 @@ const siliconflowModels = [
     "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
     "deepseek-ai/DeepSeek-V3",
     "meta-llama/Llama-3.3-70B-Instruct",
-    "THUDM/glm-4-9b-chat"
+    "THUDM/glm-4-9b-chat",
+    "Pro/deepseek-ai/DeepSeek-R1",
+    "Pro/deepseek-ai/DeepSeek-V3"
 ];
 let seq = 1000; // 内置的模型序号生成器从1000开始
 const DEFAULT_MODELS = [
@@ -928,8 +954,8 @@ const internalAllowedWebDavEndpoints = [
     "https://app.koofr.net/dav/Koofr"
 ];
 const DEFAULT_GA_ID = "G-89WN60ZK2E";
-const SAAS_CHAT_URL = "https://nextchat.dev/chat";
-const SAAS_CHAT_UTM_URL = "https://nextchat.dev/chat?utm=github";
+const SAAS_CHAT_URL = "https://nextchat.club";
+const SAAS_CHAT_UTM_URL = "https://nextchat.club?utm=github";
 
 
 /***/ }),
