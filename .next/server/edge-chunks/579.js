@@ -553,6 +553,14 @@ const KnowledgeCutOffDate = {
     "gpt-4-turbo": "2023-12",
     "gpt-4-turbo-2024-04-09": "2023-12",
     "gpt-4-turbo-preview": "2023-12",
+    "gpt-4.1": "2024-06",
+    "gpt-4.1-2025-04-14": "2024-06",
+    "gpt-4.1-mini": "2024-06",
+    "gpt-4.1-mini-2025-04-14": "2024-06",
+    "gpt-4.1-nano": "2024-06",
+    "gpt-4.1-nano-2025-04-14": "2024-06",
+    "gpt-4.5-preview": "2023-10",
+    "gpt-4.5-preview-2025-02-27": "2023-10",
     "gpt-4o": "2023-10",
     "gpt-4o-2024-05-13": "2023-10",
     "gpt-4o-2024-08-06": "2023-10",
@@ -598,6 +606,7 @@ const DEFAULT_TTS_VOICES = (/* unused pure expression or super */ null && ([
 const VISION_MODEL_REGEXES = (/* unused pure expression or super */ null && ([
     /vision/,
     /gpt-4o/,
+    /gpt-4\.1/,
     /claude-3/,
     /gemini-1\.5/,
     /gemini-exp/,
@@ -608,7 +617,9 @@ const VISION_MODEL_REGEXES = (/* unused pure expression or super */ null && ([
     /gpt-4-turbo(?!.*preview)/,
     /^dall-e-3$/,
     /glm-4v/,
-    /vl/i
+    /vl/i,
+    /o3/,
+    /o4-mini/
 ]));
 const EXCLUDE_VISION_MODEL_REGEXES = (/* unused pure expression or super */ null && ([
     /claude-3-5-haiku-20241022/
@@ -625,6 +636,14 @@ const openaiModels = [
     "gpt-4-32k-0613",
     "gpt-4-turbo",
     "gpt-4-turbo-preview",
+    "gpt-4.1",
+    "gpt-4.1-2025-04-14",
+    "gpt-4.1-mini",
+    "gpt-4.1-mini-2025-04-14",
+    "gpt-4.1-nano",
+    "gpt-4.1-nano-2025-04-14",
+    "gpt-4.5-preview",
+    "gpt-4.5-preview-2025-02-27",
     "gpt-4o",
     "gpt-4o-2024-05-13",
     "gpt-4o-2024-08-06",
@@ -638,7 +657,9 @@ const openaiModels = [
     "dall-e-3",
     "o1-mini",
     "o1-preview",
-    "o3-mini"
+    "o3-mini",
+    "o3",
+    "o4-mini"
 ];
 const googleModels = [
     "gemini-1.0-pro",
