@@ -1,0 +1,25 @@
+"use strict";
+/*
+ * ATTENTION: An "eval-source-map" devtool has been used.
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+exports.id = "vendor-chunks/micromark-factory-space";
+exports.ids = ["vendor-chunks/micromark-factory-space"];
+exports.modules = {
+
+/***/ "(ssr)/./node_modules/micromark-factory-space/dev/index.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/micromark-factory-space/dev/index.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   factorySpace: () => (/* binding */ factorySpace)\n/* harmony export */ });\n/* harmony import */ var micromark_util_character__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! micromark-util-character */ \"(ssr)/./node_modules/micromark-util-character/dev/index.js\");\n/**\n * @typedef {import('micromark-util-types').Effects} Effects\n * @typedef {import('micromark-util-types').State} State\n */ \n/**\n * @param {Effects} effects\n * @param {State} ok\n * @param {string} type\n * @param {number} [max=Infinity]\n * @returns {State}\n */ function factorySpace(effects, ok, type, max) {\n    const limit = max ? max - 1 : Number.POSITIVE_INFINITY;\n    let size = 0;\n    return start;\n    /** @type {State} */ function start(code) {\n        if ((0,micromark_util_character__WEBPACK_IMPORTED_MODULE_0__.markdownSpace)(code)) {\n            effects.enter(type);\n            return prefix(code);\n        }\n        return ok(code);\n    }\n    /** @type {State} */ function prefix(code) {\n        if ((0,micromark_util_character__WEBPACK_IMPORTED_MODULE_0__.markdownSpace)(code) && size++ < limit) {\n            effects.consume(code);\n            return prefix;\n        }\n        effects.exit(type);\n        return ok(code);\n    }\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9ub2RlX21vZHVsZXMvbWljcm9tYXJrLWZhY3Rvcnktc3BhY2UvZGV2L2luZGV4LmpzIiwibWFwcGluZ3MiOiI7Ozs7O0FBQUE7OztDQUdDLEdBRXFEO0FBRXREOzs7Ozs7Q0FNQyxHQUNNLFNBQVNDLGFBQWFDLE9BQU8sRUFBRUMsRUFBRSxFQUFFQyxJQUFJLEVBQUVDLEdBQUc7SUFDakQsTUFBTUMsUUFBUUQsTUFBTUEsTUFBTSxJQUFJRSxPQUFPQyxpQkFBaUI7SUFDdEQsSUFBSUMsT0FBTztJQUVYLE9BQU9DO0lBRVAsa0JBQWtCLEdBQ2xCLFNBQVNBLE1BQU1DLElBQUk7UUFDakIsSUFBSVgsdUVBQWFBLENBQUNXLE9BQU87WUFDdkJULFFBQVFVLEtBQUssQ0FBQ1I7WUFDZCxPQUFPUyxPQUFPRjtRQUNoQjtRQUVBLE9BQU9SLEdBQUdRO0lBQ1o7SUFFQSxrQkFBa0IsR0FDbEIsU0FBU0UsT0FBT0YsSUFBSTtRQUNsQixJQUFJWCx1RUFBYUEsQ0FBQ1csU0FBU0YsU0FBU0gsT0FBTztZQUN6Q0osUUFBUVksT0FBTyxDQUFDSDtZQUNoQixPQUFPRTtRQUNUO1FBRUFYLFFBQVFhLElBQUksQ0FBQ1g7UUFDYixPQUFPRCxHQUFHUTtJQUNaO0FBQ0YiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9uZXh0Y2hhdC8uL25vZGVfbW9kdWxlcy9taWNyb21hcmstZmFjdG9yeS1zcGFjZS9kZXYvaW5kZXguanM/NjFkMiJdLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEB0eXBlZGVmIHtpbXBvcnQoJ21pY3JvbWFyay11dGlsLXR5cGVzJykuRWZmZWN0c30gRWZmZWN0c1xuICogQHR5cGVkZWYge2ltcG9ydCgnbWljcm9tYXJrLXV0aWwtdHlwZXMnKS5TdGF0ZX0gU3RhdGVcbiAqL1xuXG5pbXBvcnQge21hcmtkb3duU3BhY2V9IGZyb20gJ21pY3JvbWFyay11dGlsLWNoYXJhY3RlcidcblxuLyoqXG4gKiBAcGFyYW0ge0VmZmVjdHN9IGVmZmVjdHNcbiAqIEBwYXJhbSB7U3RhdGV9IG9rXG4gKiBAcGFyYW0ge3N0cmluZ30gdHlwZVxuICogQHBhcmFtIHtudW1iZXJ9IFttYXg9SW5maW5pdHldXG4gKiBAcmV0dXJucyB7U3RhdGV9XG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBmYWN0b3J5U3BhY2UoZWZmZWN0cywgb2ssIHR5cGUsIG1heCkge1xuICBjb25zdCBsaW1pdCA9IG1heCA/IG1heCAtIDEgOiBOdW1iZXIuUE9TSVRJVkVfSU5GSU5JVFlcbiAgbGV0IHNpemUgPSAwXG5cbiAgcmV0dXJuIHN0YXJ0XG5cbiAgLyoqIEB0eXBlIHtTdGF0ZX0gKi9cbiAgZnVuY3Rpb24gc3RhcnQoY29kZSkge1xuICAgIGlmIChtYXJrZG93blNwYWNlKGNvZGUpKSB7XG4gICAgICBlZmZlY3RzLmVudGVyKHR5cGUpXG4gICAgICByZXR1cm4gcHJlZml4KGNvZGUpXG4gICAgfVxuXG4gICAgcmV0dXJuIG9rKGNvZGUpXG4gIH1cblxuICAvKiogQHR5cGUge1N0YXRlfSAqL1xuICBmdW5jdGlvbiBwcmVmaXgoY29kZSkge1xuICAgIGlmIChtYXJrZG93blNwYWNlKGNvZGUpICYmIHNpemUrKyA8IGxpbWl0KSB7XG4gICAgICBlZmZlY3RzLmNvbnN1bWUoY29kZSlcbiAgICAgIHJldHVybiBwcmVmaXhcbiAgICB9XG5cbiAgICBlZmZlY3RzLmV4aXQodHlwZSlcbiAgICByZXR1cm4gb2soY29kZSlcbiAgfVxufVxuIl0sIm5hbWVzIjpbIm1hcmtkb3duU3BhY2UiLCJmYWN0b3J5U3BhY2UiLCJlZmZlY3RzIiwib2siLCJ0eXBlIiwibWF4IiwibGltaXQiLCJOdW1iZXIiLCJQT1NJVElWRV9JTkZJTklUWSIsInNpemUiLCJzdGFydCIsImNvZGUiLCJlbnRlciIsInByZWZpeCIsImNvbnN1bWUiLCJleGl0Il0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(ssr)/./node_modules/micromark-factory-space/dev/index.js\n");
+
+/***/ })
+
+};
+;

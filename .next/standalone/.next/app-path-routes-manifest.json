@@ -1,1 +1,0 @@
-{"/_not-found":"/_not-found","/page":"/","/api/config/route":"/api/config","/api/tencent/route":"/api/tencent","/api/[provider]/[...path]/route":"/api/[provider]/[...path]","/api/artifacts/route":"/api/artifacts","/api/upstash/[action]/[...key]/route":"/api/upstash/[action]/[...key]","/api/webdav/[...path]/route":"/api/webdav/[...path]"}
