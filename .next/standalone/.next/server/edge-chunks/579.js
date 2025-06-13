@@ -684,7 +684,8 @@ const googleModels = [
     "gemini-2.0-flash-thinking-exp-1219",
     "gemini-2.0-flash-thinking-exp-01-21",
     "gemini-2.0-pro-exp",
-    "gemini-2.0-pro-exp-02-05"
+    "gemini-2.0-pro-exp-02-05",
+    "gemini-2.5-pro-preview-06-05"
 ];
 const anthropicModels = [
     "claude-instant-1.2",
@@ -769,7 +770,19 @@ const xAIModes = [
     "grok-vision-beta",
     "grok-2-vision-1212",
     "grok-2-vision",
-    "grok-2-vision-latest"
+    "grok-2-vision-latest",
+    "grok-3-mini-fast-beta",
+    "grok-3-mini-fast",
+    "grok-3-mini-fast-latest",
+    "grok-3-mini-beta",
+    "grok-3-mini",
+    "grok-3-mini-latest",
+    "grok-3-fast-beta",
+    "grok-3-fast",
+    "grok-3-fast-latest",
+    "grok-3-beta",
+    "grok-3",
+    "grok-3-latest"
 ];
 const chatglmModels = [
     "glm-4-plus",
